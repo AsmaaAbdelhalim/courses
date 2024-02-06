@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Category;
+use App\Models\Course;
+use App\Models\Enrollment;
+use App\Models\User;
+use App\Models\Contact;
+use App\Models\Payment;
 
 class AdminController extends Controller
 {
@@ -12,6 +18,22 @@ class AdminController extends Controller
     public function index()
     {
         //
+    }
+
+    /**
+     * 
+     */
+
+    public function dashboard()
+    {
+        $categories = Category::count();
+        $courses = Course::count();
+        $enrollments = Enrollment::count();
+        $users = User::count();
+        $contacts = Contact::count();
+        $payments = Payment::count();
+        $total_payments = Payment::sum('total_price');
+        return view('admin', compact('categories', 'courses', 'enrollments', 'users', 'contacts', 'payments', 'total_payments'));
     }
 
     /**

@@ -4,7 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
+//use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
@@ -13,11 +14,12 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next,...$roles): Response
+
+           public function handle(Request $request, Closure $next, ...$roles)
     {
-        if( $request->user() && in_array($request->user()->role, $roles)){
-           return $next($request);
-           
+        if (Auth::check() && in_array(Auth::user()->role, $roles)) {
+            return $next($request);
+        
         }else{
             return redirect()->route('login')->with('error', 'you are not authorized to access this page.');
         }

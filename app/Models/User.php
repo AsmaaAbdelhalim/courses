@@ -18,7 +18,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
     ];
@@ -48,9 +49,46 @@ class User extends Authenticatable
     
     public function course()
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(Course::class);
     }
 
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function user()
+    {
+        return $this->hasMany(User::class);
+    }
+    
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class)->withPivot('lessons_completed');
+    }
+
+    public function progresses()
+    {
+        return $this->belongsToMany(Course::class)->withPivot('lessons_completed', 'completed');
+    }
+
+
+    public function lessons()
+    {
+        return $this->belongsToMany(Lesson::class, 'course_user')->withPivot('lessons_completed')
+        ->withTimestamps();
+    }
 
 
 }
