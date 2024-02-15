@@ -71,25 +71,6 @@ class WishlistController extends Controller
         return redirect()->back()->with('success', 'Course removed from wishlist successfully.');
     }
 
-
-    public function toggleWishlist(Course $course)
-{
-    if (!Auth::check()) {
-        return redirect()->route('login')->with('error', 'Please log in to add to wishlist.');
-    }
-    
-    $user = Auth::user();
-    
-    if ($user->inWishlist($course)) {
-        $user->wishlists()->detach($course);
-        $message = 'Course removed from wishlist successfully.';
-    } else {
-        $user->wishlists()->attach($course);
-        $message = 'Course added to wishlist successfully.';
-    }
-    
-    return redirect()->back()->with('success', $message);
-}
     /**
      * Show the form for creating a new resource.
      */

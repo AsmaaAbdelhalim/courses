@@ -110,8 +110,7 @@
                         <h6 class="text-primary mb-3"><i class="fas fa-users"></i> {{ $course->enrollments_count }} students</h6>
                         <h6 class="text-primary mb-3"><i class="fas fa-star"></i> {{ $course->rating }}</h6>
                         <p></p>
-                        <h4 class="text-primary mb-3"><i class="fas fa-book"></i> 
-                        <p>{{ $course->description }}</p>
+
 
 
 
@@ -160,7 +159,7 @@
             {{ csrf_field() }}
                             {{method_field('PUT')}}
                 @csrf
-                <button type="submit"class="btn btn-info "
+                <button type="submit" class="btn btn-info "
             style="width:20%">Enroll</button>
             </form>
 
@@ -171,25 +170,11 @@
     @endif
 
                         <h6><i class="fas fa-book"></i><p>{{ $course->summary }}</p></h6>
-                        <h2 class="mb-4">Est dolor lorem et ea</h2>
+                        <h2 class="mb-4">Description</h2>
+                        <h4 class="text-primary mb-3"><i class="fas fa-book"></i> 
+                        <p>{{ $course->description }}</p>
                         <img class="img-fluid rounded w-50 float-left mr-4 mb-3" src="{{ asset('images/' . $course->image) }}" alt="Image">
-                        <p>Diam dolor est labore duo invidunt ipsum clita et, sed et lorem voluptua tempor invidunt at
-                            est sanctus sanctus. Clita dolores sit kasd diam takimata justo diam lorem sed. Magna amet
-                            sed rebum eos. Clita no magna no dolor erat diam tempor rebum consetetur, sanctus labore sed
-                            nonumy diam lorem amet eirmod. No at tempor sea diam kasd, takimata ea nonumy elitr
-                            sadipscing gubergren erat. Gubergren at lorem invidunt sadipscing rebum sit amet ut ut,
-                            voluptua diam dolores at sadipscing stet. Clita dolor amet dolor ipsum vero ea ea eos.
-                            Invidunt sed diam dolores takimata dolor dolore dolore sit. Sit ipsum erat amet lorem et,
-                            magna sea at sed et eos. Accusam eirmod kasd lorem clita sanctus ut consetetur et. Et duo
-                            tempor sea kasd clita ipsum et. Takimata kasd diam justo est eos erat aliquyam et ut. Ea sed
-                            sadipscing no justo et eos labore, gubergren ipsum magna dolor lorem dolore, elitr aliquyam
-                            takimata sea kasd dolores diam, amet et est accusam labore eirmod vero et voluptua. Amet
-                            labore clita duo et no. Rebum voluptua magna eos magna, justo gubergren labore sit.</p>
-                        <p>Diam dolor est labore duo invidunt ipsum clita et, sed et lorem voluptua tempor invidunt at
-                            est sanctus sanctus. Clita dolores sit kasd diam takimata justo diam lorem sed. Magna amet
-                            sed rebum eos. Clita no magna no dolor erat diam tempor rebum consetetur, sanctus labore sed
-                            nonumy diam lorem amet eirmod. No at tempor sea diam kasd, takimata ea nonumy elitr
-                            sadipscing gubergren erat.</p>
+                        
                     </div>
 
                     <!-- Comment List -->

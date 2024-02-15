@@ -31,9 +31,9 @@
             <td>{{ $course->id }}</td>
             <td>{{ $course->name }}</td>
             <td>{{ $course->price }}</td>
-            <td>{{ $course->user->name }}</td>
-            <td>{{ $course->lesson_count }}</td>
-            <td>{{ $course->lesson_title }}</td>
+            <td>{{ $course->user->first_name }}</td>
+            <td>{{ $course->lessons_count }}</td>
+            <td>{{ $course->wishlists_count }}</td>
             <td>{{ $course->enrollment_count }}</td>
             <td>{{ $course->category_id }}</td>
             <td>

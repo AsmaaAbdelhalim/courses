@@ -84,7 +84,12 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $courses = $category->courses()->paginate(12);
         $creator = $category->user;
-        return view('category.show', compact(['category','creator','courses']));
+
+        $user = Auth::user();
+        $user_wishlist_ids = [];
+        if($user){
+        $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();}
+        return view('category.show', compact(['category','creator','courses', 'user_wishlist_ids']));
     }
 
     /**

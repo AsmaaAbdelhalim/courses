@@ -70,7 +70,7 @@ Route::resource('enrollment', EnrollmentController::class)->only(['index', 'show
 Route::get('/dashboard', [App\Http\Controllers\UserController::class, 'dashboard'])->middleware('auth');
 
 Route::resource('course', CourseController::class)->only(['index', 'show', 'create','edit', 'store','update', 'destroy']);
-Route::get('/course/list',[CourseController::class, 'list'])->name('course.list');
+Route::get('/course.list', [App\Http\Controllers\CourseController::class, 'list'])->name('course.list');
 
 Route::middleware('role:1')->group (function(){
 
