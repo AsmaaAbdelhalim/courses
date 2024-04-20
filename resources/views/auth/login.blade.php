@@ -30,7 +30,7 @@
 
                             <div class="col-md-6">
                                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
-
+                                <span onclick="togglePasswordVisibility()"><i class="fa fa-eye"></i></span>
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -39,6 +39,22 @@
                             </div>
                         </div>
 
+                        <script>
+                    function togglePasswordVisibility() {
+                    const passwordInput = document.getElementById('password');
+                    const toggleButton = document.querySelector('.toggle-password i');
+
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleButton.classList.remove('fa-eye');
+                        toggleButton.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleButton.classList.remove('fa-eye-slash');
+                        toggleButton.classList.add('fa-eye');
+                                }
+                            }
+                        </script>
                         <div class="row mb-3">
                             <div class="col-md-6 offset-md-4">
                                 <div class="form-check">

@@ -9,6 +9,7 @@ use App\Models\Enrollment;
 use App\Models\User;
 use App\Models\Contact;
 use App\Models\Payment;
+use App\Models\Review;
 
 class AdminController extends Controller
 {
@@ -33,7 +34,8 @@ class AdminController extends Controller
         $contacts = Contact::count();
         $payments = Payment::count();
         $total_payments = Payment::sum('total_price');
-        return view('admin', compact('categories', 'courses', 'enrollments', 'users', 'contacts', 'payments', 'total_payments'));
+        $reviews = Review::count();
+        return view('admin', compact('categories', 'courses', 'enrollments', 'users', 'contacts', 'payments', 'total_payments', 'reviews'));
     }
 
     /**

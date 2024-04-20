@@ -19,7 +19,7 @@
             <th>Price</th>
             <th>Created By</th>
             <th>Num of lessons</th>
-            <th>Lessons</th>
+            <th>wishlists</th>
             <th>Num of user enrolled</th>
             <th>Category</th>
             <th>Actions</th>

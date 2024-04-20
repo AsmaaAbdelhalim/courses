@@ -72,21 +72,15 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class);
     }
 
-
+  
     public function courses()
     {
-        return $this->belongsToMany(Course::class)->withPivot('lessons_completed');
+        return $this->belongsToMany(Course::class, 'course_users')->withPivot('completed');
     }
-
-    public function progresses()
-    {
-        return $this->belongsToMany(Course::class)->withPivot('lessons_completed', 'completed');
-    }
-
 
     public function lessons()
     {
-        return $this->belongsToMany(Lesson::class, 'course_user')->withPivot('lessons_completed')
+        return $this->belongsToMany(Lesson::class, 'course_users')->withPivot('lessons_completed')
         ->withTimestamps();
     }
 

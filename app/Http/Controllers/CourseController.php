@@ -128,6 +128,8 @@ class CourseController extends Controller
         $course = Course::with('reviews')->findOrFail($id);
         $categories = Category::all();
         $user = Auth::id();
+        //dd($user, $course->users());
+        
         return view('course.show', compact('course','creator','categories','user' ));
     }
 

@@ -42,46 +42,8 @@
                                         <option value="{{$course->id}}">{{$course->name}}</option>
                                         @endforeach
                                     </select>
-                                    
-
                             </div>
-                            <!-- <div class="form-group">
-                                <label for="exampleInputEmail1" class="form-label">Price</label>
-                                <input type="text"  name="price" class="@error('price') is-invalid @enderror form-control">
-                                @error('price')
-                                <div class="alert alert-danger mt-1 mb-1">Enter Your Price</div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputEmail1" class="form-label">Description</label>
-                                <input type="text"  name="description" class="@error('description') is-invalid @enderror form-control" >
-                                @error('description')
-                                <div class="alert alert-danger mt-1 mb-1">Enter Your Description</div>
-                                @enderror
-                            </div> -->
-
-
-                            <!-- <div class="form-group">
-                                <label for="exampleInputEmail1" class="form-label">Location</label>
-                                <input type="text"  name="location" class="@error('location') is-invalid @enderror form-control"  >
-                                @error('location')
-                                <div class="alert alert-danger mt-1 mb-1">Please Enter Your Location</div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputEmail1" class="form-label">rate</label>
-                                <input type="text"  name="rate" class="@error('rate') is-invalid @enderror form-control"  >
-                                @error('rate')
-                                <div class="alert alert-danger mt-1 mb-1">Please Enter Your rate</div>
-                                @enderror
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputEmail1" class="form-label">Image</label>
-                                <input type="file"  name="name_img" placeholder="Choose file..." class="@error('file') is-invalid @enderror form-control"  >
-                                @error('name_img')
-                                <div class="alert alert-danger mt-1 mb-1">Pleace Enter Your Image</div>
-                                @enderror
-                            </div> -->
+                            
                             <button type="submit" class="btn btn-success">Save</button>
                             <a href="/lesson" class="btn btn-danger">Cancel</a>
                         </form>

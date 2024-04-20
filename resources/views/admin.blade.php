@@ -165,7 +165,7 @@
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
       <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Courses</span>
     </a>
 
     <!-- Sidebar -->
@@ -173,10 +173,14 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+        @if(Auth::user()->avatar)
+    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" class="img-circle elevation-3">
+    @else
+    <img src="{{ asset('images/default-avatar.png') }}"  class="img-circle elevation-3">
+    @endif
         </div>
         <div class="info">
-          <a href="#" class="d-block">Alexander Pierce</a>
+          <a href="#" class="d-block">{{ Auth::user()->first_name }}</a>
         </div>
       </div>
 
@@ -264,13 +268,13 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('course.create')}}" class="nav-link">
+                <a href="{{route('lesson.create')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Add Lesson</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('course.list')}}" class="nav-link">
+                <a href="{{route('lesson.list')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Lessons</p>
                 </a>
@@ -404,7 +408,7 @@
               <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-book"></i></span>
 
               <div class="info-box-content">
-                <span class="info-box-text">courses</span>
+                <span class="info-box-text">Courses</span>
                 <span class="info-box-number">{{ $courses }}</span>
               </div>
               <!-- /.info-box-content -->
@@ -431,11 +435,11 @@
           <!-- /.col -->
           <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
-            <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
+            <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-star"></i></span>
 
 <div class="info-box-content">
-  <span class="info-box-text">payments</span>
-  <span class="info-box-number">{{ $payments}}</span>
+  <span class="info-box-text">Reviews</span>
+  <span class="info-box-number">{{ $reviews}}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -481,7 +485,7 @@
 
             <span class="info-box-icon bg-info elevation-1"><i class="fas fa-money-check"></i></span>
 <div class="info-box-content">
-  <span class="info-box-text">payments</span>
+  <span class="info-box-text">Payments</span>
   <span class="info-box-number">{{ $payments}}</span>
               </div>
               <!-- /.info-box-content -->

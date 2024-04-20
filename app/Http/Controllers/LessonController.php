@@ -7,8 +7,8 @@ use App\Models\Lesson;
 use App\Models\Course;
 use App\Models\User;
 use App\Models\Enrollment;
-use App\Models\Progress;
-use Illuminate\Support\Facades\DB;
+use App\Models\Course_user;
+//use Illuminate\Support\Facades\DB;
 
 class LessonController extends Controller
 {
@@ -34,29 +34,41 @@ class LessonController extends Controller
         $course = Course::findOrFail($course_id);
         $lessons = Lesson::where('course_id', $course_id)->get();
         $lesson = Lesson::find($lesson_id);
-        if (!$course->enrollment(Auth::user())) {
-            return redirect()->route('course.show', $course_id)->with('error', 'You are not enrolled in this course.');
-        }
+        
+        // if (!$course->enrollment(Auth::user())) {
+        //     return redirect()->route('course.show', $course_id)->with('error', 'You are not enrolled in this course.');
+        // }
         if($user && $lesson)
         {
-            DB::table('course_user')->updateOrInsert(
-                ['user_id' => $user->id, 'course_id' => $course_id ,'lesson_id' => $lesson->id],
-            
-            [
-            'course_id' => $course_id ,
-            'lesson_id' => $lesson_id ,
-            'user_id' => $user->id ,
-        ]);
-        
+            Course_user::updateOrInsert(
+                ['user_id' => $user->id, 'course_id' => $course_id, 'lesson_id' => $lesson->id],
+            );
         }
         else
         {
             return redirect()->back()->with('error', 'You have not completed this lesson yet.');
         } 
+
+        $userCourse = $user->lessons()->where('lesson_id', $lesson_id)->first();
+        $userCourse -> pivot-> update(['completed' => 1,]);
+
+        $totalLessons = $course->lessons->count();
+        $completedLessons = $user->lessons->where('course_id', $lesson->course_id)->count();
+        $progress = number_format(( $completedLessons / $totalLessons ) * 100 ) ;
+     
+
         
+        $previousLesson = Lesson::where('course_id', $lesson->course_id)
+        ->where('id', '<', $lesson->id)
+        ->orderBy('id', 'desc')
+        ->first();
 
+        $nextLesson = Lesson::where('course_id', $lesson->course_id)
+        ->where('id', '>', $lesson->id)
+        ->orderBy('id')
+        ->first();
 
-        return view('lesson.show', compact('course', 'lessons','lesson','user' ));
+        return view('lesson.show', compact('course', 'lessons','lesson','user', 'previousLesson' ,'nextLesson' ,'userCourse','progress'));
     }
 
     /**
@@ -111,6 +123,7 @@ class LessonController extends Controller
             $image->move(public_path('images'), $fileName);
             $lesson->images = $fileName;
         }
+
         $lesson->save();
         return redirect()->route('lesson.index')->with('success', 'Lesson created successfully!');
     }

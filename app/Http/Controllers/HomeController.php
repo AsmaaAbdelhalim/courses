@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Course;
+// use App\Models\User;
+// use App\Models\Lesson;
+// use App\Models\Course_user;
 
 class HomeController extends Controller
 {

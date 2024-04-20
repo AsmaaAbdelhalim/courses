@@ -45,9 +45,10 @@ public function wishlists()
     return $this->hasMany(Wishlist::class);
 }
 
+
 public function users()
 {
-    return $this->belongsToMany(User::class, 'course_user')->withPivot('lessons_completed');
+    return $this->belongsToMany(User::class, 'course_users')->withPivot('completed');
 }
 
 public function teachers()
@@ -61,6 +62,29 @@ public function payments()
 {
     return $this->hasMany(Payment::class);
 }
+
+
+
+// public function getProgressAttribute()
+// {
+//     return $this->progress()->first();
+// }
+
+// public function getTotalEnrollmentsAttribute()
+// {
+//     return $this->enrollment()->count();
+// }
+
+// public function getTotalReviewsAttribute()
+// {
+//     return $this->reviews()->count();
+// }
+
+// public function getAverageRatingAttribute()
+// {
+//     return $this->reviews()->avg('rating');
+// }
+
 
 
 }

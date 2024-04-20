@@ -27,11 +27,11 @@
             <td>{{ $lesson->id }}</td>
             <td>{{ $lesson->title }}</td>
             <td>{{ $lesson->course->name }}</td>
-            <td>{{$lesson->user->name}}</td>
+            <td>{{$lesson->user->first_name}}</td>
             <td>
                 <!-- Action buttons --> 
                 <a
-            href="{{route ('lesson.show',[$lesson->id])}}"
+            href=""
              class="btn btn-info ">
               Details
             </a>

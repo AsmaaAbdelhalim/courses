@@ -40,6 +40,11 @@ class Lesson extends Model
         ->withPivot('lessons_completed')
         ->withTimestamps();
     }
+    public function courses(){
+        return $this->belongsToMany(Course::class, 'course_users')
+        ->withPivot('completed')
+        ->withTimestamps();
+    }
 
     }
            

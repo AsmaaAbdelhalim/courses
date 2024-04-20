@@ -1,5 +1,3 @@
-
-
 @extends('layouts.app')
 @section('content')
 @include('layouts.header')
@@ -98,33 +96,15 @@
 
   
                          
-                        <h6 class="text-primary mb-3"><i class="fas fa-book"></i> {{ $course->lessons_count }} lessons</h6>
-                        <h6 class="text-primary mb-3"><i class="fas fa-star"></i> {{ $course->rating }}</h6>
-                        <h6 class="text-primary mb-3"><i class="fas fa-laptop"></i></h6>
-                        <h6 class="text-primary mb-3"><i class="fas fa-user-graduate"></i> {{ $course->level }}</h6>
-                        <h6 class="text-primary mb-3"><i class="fas fa-folder"></i> </h6>
-         
-                        <h6 class="text-primary mb-3"><i class="fas fa-file-alt"></i> {{ $course->description }}</h6>
-
-                        <h4 class="text-primary mb-3"><i class="fas fa-check-circle"> {{ $course->requirement }}</i>
-                        <h6 class="text-primary mb-3"><i class="fas fa-users"></i> {{ $course->enrollments_count }} students</h6>
-                        <h6 class="text-primary mb-3"><i class="fas fa-star"></i> {{ $course->rating }}</h6>
-                        <p></p>
-
-
-
-
-
-                        <video width="320" height="240" controls autoplay>
-                        <source src="movie.mp4" type="video/mp4">
-                        <source src="movie.ogg" type="video/ogg">
-                        Your browser does not support the video tag.
-                        </video>
-  
-
-
-
-
+                        <i class="fas fa-book"></i>
+                        <i class="fas fa-star"></i> 
+                        <i class="fas fa-laptop"></i>
+                        <i class="fas fa-user-graduate"></i> 
+                        <i class="fas fa-folder"></i> 
+                        <i class="fas fa-file-alt"></i> 
+                        <h4 class="text-primary mb-3"><i class="fas fa-check-circle"> </i>
+                        <i class="fas fa-users"></i>
+                        <i class="fas fa-star"></i>
 <div class="container-fluid py-5">
         <div class="container py-5">
             <div class="row">
@@ -132,8 +112,9 @@
                     <div class="mb-5">
                         <h6 class="text-primary mb-3"><i class="far fa-clock"></i> {{ $course->created_at->format('Y-m')}}</h6>
                         <h1 class="mb-5">{{$course->name}} Course</h1>
-                        <img class="img-fluid rounded w-100 mb-4" src="{{ asset('images/' . $course->image) }}" alt="Image">
-                        
+                        <video class="img-fluid rounded w-100 mb-4" controls autoplay>
+                        <source src="{{ asset('videos/' . $course->videos) }}" type="video/mp4">
+                        </video>
 
                         <p> <h4>
                     @if($course->price == 0)
@@ -168,12 +149,16 @@
     @else
         <button class="btn btn-danger"><a href="{{ route('login') }}">Please log in to enroll in courses.</a></button>
     @endif
-
-                        <h6><i class="fas fa-book"></i><p>{{ $course->summary }}</p></h6>
+                        <h6><i class="fas fa-check-circle"></i>Requirement<p>{{ $course->requirement }}</p></h6>
+                        <h6><i class="fas fa-book"></i>Summary<p>{{ $course->summary }}</p></h6>
                         <h2 class="mb-4">Description</h2>
-                        <h4 class="text-primary mb-3"><i class="fas fa-book"></i> 
+                        <h4><i class="fas fa-book"></i> 
                         <p>{{ $course->description }}</p>
-                        <img class="img-fluid rounded w-50 float-left mr-4 mb-3" src="{{ asset('images/' . $course->image) }}" alt="Image">
+                        <img class="img-fluid rounded w-100 mb-4" src="{{ asset('images/' . $course->image) }}" alt="Image">
+                        <a href="{{ asset('files/' . $course->files) }}"> {{ $course->name }} pdf</a>
+                               
+
+                        
                         
                     </div>
 
@@ -200,7 +185,6 @@
                                  @endfor 
                                 </div>
                                 <p>{{ $review->review }}</p>
-                                <button class="btn btn-sm btn-secondary">Reply</button>
                             </div>
                         </div>                  
                         @endforeach
@@ -343,6 +327,5 @@
 @endif
 
 {{$course->lessons_count}}
- 
 
 @endsection

@@ -11,6 +11,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ExamController;
 
 
 
@@ -70,7 +71,7 @@ Route::resource('enrollment', EnrollmentController::class)->only(['index', 'show
 Route::get('/dashboard', [App\Http\Controllers\UserController::class, 'dashboard'])->middleware('auth');
 
 Route::resource('course', CourseController::class)->only(['index', 'show', 'create','edit', 'store','update', 'destroy']);
-Route::get('/course.list', [App\Http\Controllers\CourseController::class, 'list'])->name('course.list');
+Route::get('course.list', [App\Http\Controllers\CourseController::class, 'list'])->name('course.list');
 
 Route::middleware('role:1')->group (function(){
 
@@ -135,8 +136,7 @@ Route::post('enrollment/checkout', [EnrollmentController::class, 'checkout'])->n
     ->name('category.courses');
 
     Route::resource('lesson',App\Http\Controllers\LessonController::class)->only(['list', 'index', 'create','edit', 'store','update', 'destroy']);
-    
-
+    Route::get('lesson/list',[App\Http\Controllers\LessonController::class, 'list'])->name('lesson.list');
    Route::resource('enrollment',App\Http\Controllers\EnrollmentController::class)->only
    ('index', 'show', 'create','edit', 'store','update', 'destroy');
 
@@ -196,6 +196,12 @@ Route::get('/checkout/{course}', [PaymentController::class, 'checkout'])->name('
 Route::get('/success', 'App\Http\Controllers\PaymentController@success')->name('success');
 Route::post('/payment/store', [PaymentController::class, 'store'])->name('payment.store');
 
+
+Route::get('/exam/create' ,  [ExamController::class, 'create']) -> name ('exam.create') ; 
+Route::post('/exam/store' ,  [ExamController::class, 'store']) -> name ('exam.store') ; 
+Route::get('/exam/{exam}/edit' ,  [ExamController::class, 'edit']) -> name ('exam.edit') ; 
+Route::put('/exam/{exam}' ,  [ExamController::class, 'update']) -> name ('exam.update') ; 
+Route::delete('/exam/{exam}' ,  [ExamController::class, 'destroy']) -> name ('exam.destroy') ;
 
 Route::match(['GET', 'POST'],'pay', [PaymentController::class, 'pay'])->name('pay.order');
 //Route::get('success', [PaymentController::class, 'success'])->name('pay.success');
