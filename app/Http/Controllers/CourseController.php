@@ -10,6 +10,7 @@ use App\Models\Lesson;
 use App\Models\Review;
 use App\Models\Wishlist;
 use App\Models\Payment;
+use Carbon\Carbon;
 //use Illuminate\Pagination\LengthAwarePaginator;
 
 
@@ -233,5 +234,21 @@ class CourseController extends Controller
 
     }
 
+    public function search(Request $request)
+    {
+        $q = $request->get('q');
+
+        $courses = Course::query()
+            //->where('active', '=', true)
+            ->whereDate('created_at', '<=', Carbon::now())
+            ->orderBy('created_at', 'desc')
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'like', "%$q%")
+                    ->orWhere('description', 'like', "%$q%");
+            })
+            ->paginate(10);
+
+        return view('course.search', compact('courses'));
+    }
 
 }

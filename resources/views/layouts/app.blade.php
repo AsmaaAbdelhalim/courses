@@ -14,7 +14,7 @@
     <meta content="Free HTML Templates" name="description">
        <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
 

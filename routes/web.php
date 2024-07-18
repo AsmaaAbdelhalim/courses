@@ -12,8 +12,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ExamController;
-
-
+use App\Http\Controllers\QuestionController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -183,7 +183,7 @@ Route::get('/wishlist/toggle/{course}', [WishlistController::class,'toggleWishli
 //Route::get('/checkout', 'App\Http\Controllers\PaymentController@checkout')->name('checkout');
 
 Route::post('/session', 'App\Http\Controllers\PaymentController@session')->name('session');
-Route::get('/session', 'App\Http\Controllers\PaymentController@session')->name('session');
+Route::get('/session', 'App\Http\Controllers\PaymentController@session');
 
 Route::post('/payment', 'App\Http\Controllers\PaymentController@payment')->name('payment');
 
@@ -197,11 +197,10 @@ Route::get('/success', 'App\Http\Controllers\PaymentController@success')->name('
 Route::post('/payment/store', [PaymentController::class, 'store'])->name('payment.store');
 
 
-Route::get('/exam/create' ,  [ExamController::class, 'create']) -> name ('exam.create') ; 
-Route::post('/exam/store' ,  [ExamController::class, 'store']) -> name ('exam.store') ; 
-Route::get('/exam/{exam}/edit' ,  [ExamController::class, 'edit']) -> name ('exam.edit') ; 
-Route::put('/exam/{exam}' ,  [ExamController::class, 'update']) -> name ('exam.update') ; 
-Route::delete('/exam/{exam}' ,  [ExamController::class, 'destroy']) -> name ('exam.destroy') ;
+Route::resource('question', QuestionController::class)->except(['show', 'create', 'store', 'edit', 'update', 'destroy']);
+Route::resource('exam', ExamController::class)->except(['show', 'create', 'store', 'edit', 'update', 'destroy']);
+
+
 
 Route::match(['GET', 'POST'],'pay', [PaymentController::class, 'pay'])->name('pay.order');
 //Route::get('success', [PaymentController::class, 'success'])->name('pay.success');
@@ -217,3 +216,6 @@ Route::match(['GET', 'POST'],'pay', [PaymentController::class, 'pay'])->name('pa
 // });
 Route::middleware(['auth'])->group(function () {
 });
+
+Route::get('/search', [CourseController::class, 'search'])->name('search');
+
