@@ -153,7 +153,7 @@
                         <h6><i class="fas fa-book"></i>Summary<p>{{ $course->summary }}</p></h6>
                         <h2 class="mb-4">Description</h2>
                         <h4><i class="fas fa-book"></i> 
-                        <p>{{ $course->description }}</p>
+                        <h6>{{ $course->description }}</h6>
                         <img class="img-fluid rounded w-100 mb-4" src="{{ asset('images/' . $course->image) }}" alt="Image">
                         <a href="{{ asset('files/' . $course->files) }}"> {{ $course->name }} pdf</a>
                                
@@ -312,19 +312,33 @@
                     </div>
                 </div>
             </div>
+
+
+            <div class="text-center mb-5">
+                <h5 class="text-primary text-uppercase mb-3" style="letter-spacing: 5px;"></h5>
+                <h1>Courses </h1>
+            </div>
+            @if($course->category)
+<div class="row">
+    @foreach($course->category->courses as $course)
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="cat-item position-relative overflow-hidden rounded mb-2">
+                        <img class="img-fluid" style="height: 200px;" src="{{ asset('images/' . $course->image) }}" alt="course Image">
+                        <a class="cat-overlay text-white text-decoration-none" href="{{route ('course.show',[$course->id])}}">
+                            <h4 class="text-white font-weight-medium">{{ $course->name }}</h4>
+                            <span>{{ $course->lessons->count() }} lesson</span>
+                        </a>
+                    </div>
+                </div>@endforeach
+                </div>
+                @endif
+
         </div>
     </div>
     <!-- Detail End -->
 <!--  -->
 
 
-
-
-@if($course->category)
-    @foreach($course->category->courses as $course)
-        <h3>{{ $course->name }}</h3>
-    @endforeach
-@endif
 
 {{$course->lessons_count}}
 

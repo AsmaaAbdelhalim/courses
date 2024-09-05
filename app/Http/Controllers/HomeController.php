@@ -39,12 +39,12 @@ class HomeController extends Controller
     
     }
 
-    public function nav()
-    {
-        $categories = Category::all();
-        $courses = Course::all();
-        return view('layouts.app', compact('categories','courses') );
-    }
+    // public function nav()
+    // {
+    //     $categories = Category::all();
+    //     $courses = Course::all();
+    //     return view('layouts.app', compact('categories','courses') );
+    // }
 
  
 }

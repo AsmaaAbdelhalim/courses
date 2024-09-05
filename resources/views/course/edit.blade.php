@@ -1,9 +1,10 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="content-wrapper">
+
+<div class="container">
     <div class="row">
-        <div class="col-md-12">
+    <div class="col-lg-10 m-auto py-2">
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Update Course</h4>
@@ -88,13 +89,7 @@
                                 @enderror
                             </div>
    
-                            <div class="form-group">
-                                <label for="exampleInputVideo" class="form-label">Course Video</label>
-                                <input type="file" name="video" class="@error('video') is-invalid @enderror form-control" id="exampleInputVideo">
-                                @error('video')
-                                <div class="alert alert-danger mt-1 mb-1">Enter Your Video</div>
-                                @enderror
-                            </div>
+
                             <div class="form-group">
                                 <label for="exampleInputNumOfHours" class="form-label">Number of Hours</label>
                                 <input type="number" name="numOfHours" class="@error('numOfHours') is-invalid @enderror form-control" id="exampleInputNumOfHours" value="{{$course->numOfHours}}">

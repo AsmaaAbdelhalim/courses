@@ -19,9 +19,8 @@ return new class extends Migration
 
             $table->boolean('completed')->default(false);
             $table->integer('lessons_completed')->default(0);
-            $table->integer('quizzes_completed')->default(0);
-            $table->boolean('tests_completed')->default(false);
-            $table->integer('tests_attempts')->default(0);
+            $table->boolean('exams_completed')->default(false);
+            $table->integer('exams_attempts')->default(0);
             
             $table->boolean('certifications_eligible')->default(false);
 

@@ -88,7 +88,7 @@ class CourseController extends Controller
         $course->started_at = request('started_at');
         $course->finished_at = request('finished_at');
         $course->duration = request('duration');
-        $course->session = request('session');
+        
         $course->status = request('status');
 
         if ($request->hasFile('videos')) {
@@ -162,7 +162,11 @@ class CourseController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'videos' => 'required|file|mimes:mp4,mov,avi', // Adjust MIME types as needed
+        ]);
         $course = Course::findorfail($id);
+        $user_id = Auth::id();
         $course->user_id = $user_id;
         $course->name = request('name');
         $course->price = request('price');

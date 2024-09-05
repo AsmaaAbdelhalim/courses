@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Answer;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AnswerController extends Controller
 {
@@ -13,16 +14,17 @@ class AnswerController extends Controller
      */
     public function index()
     {
-        
+        $questions_answers = Answer::all();
+        return view('answer.index', compact('questions_answers'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        $questions = Question::all()->pluck('question_text', 'id')->prepend(trans('global.pleaseSelect'), '');
-        return view('answers.create', compact('questions'));
+    {        
+        $questions = Question::get()->pluck('question_text', 'id')->prepend('Please select', '');
+        return view('answer.create', compact('questions'));
     }
 
     /**
@@ -34,12 +36,14 @@ class AnswerController extends Controller
             'question_id' => 'required',
             'answer_text' => 'required',
             ]);
+            
             $answer = Answer::create([
-                'question_id' => $request->question_id,
-                'answer_text' => $request->answer_text,
-                ]);
-                return redirect()->route('answers.index')
-                ->with('success', trans('global.answerCreated'));
+                'question_id' => $request->input('question_id'),
+                        'answer_text' => $request->input('answer_text'),
+                        'correct' => $request->input('correct'),
+                        'user_id' => Auth::user()->id, // Assuming you're using authentication
+                    ]);                
+                    $answer->save();  
 
     }
 
@@ -48,8 +52,13 @@ class AnswerController extends Controller
      */
     public function show(Answer $answer)
     {
-        $answer->load('question');
-        return view('answers.show', compact('answer'));
+        //$answer->load('question');
+
+        $questions = Question::get()->pluck('question_text', 'id')->prepend('Please select', '');
+        //$answer = Answer::findOrFail($id);
+
+        return view('answer.show', compact('questions', 'answer'));
+
     }
 
     /**

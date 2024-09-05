@@ -8,17 +8,16 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     */
+     */ 
     public function up(): void
     {
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->text('answer_text');
             
-            $table->boolean('is_correct')->default(false);
-
-            $table->unsignedBigInteger('question_id')->nullable();
-
+            //$table->boolean('is_correct')->default(false);
+            $table->tinyInteger('correct')->default(0);
+            $table->unsignedBigInteger('question_id');
             $table->foreign('question_id')->references('id')->on('questions')->onDelete('cascade');
             
             $table->unsignedBigInteger('user_id');
@@ -29,10 +28,6 @@ return new class extends Migration
             $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
             $table->unsignedBigInteger('lesson_id')->nullable();
             $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
-            $table->unsignedBigInteger('quiz_id')->nullable();
-            $table->foreign('quiz_id')->references('id')->on('quizzes')->onDelete('cascade');
-            $table->unsignedBigInteger('test_id')->nullable();
-            $table->foreign('test_id')->references('id')->on('tests')->onDelete('cascade');
             $table->unsignedBigInteger('exam_id')->nullable();
             $table->foreign('exam_id')->references('id')->on('exams')->onDelete('cascade');
             $table->timestamps();

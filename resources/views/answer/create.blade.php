@@ -1,57 +1,57 @@
 @extends('layouts.admin')
+
 @section('content')
+<div class="container-fluid">
 
-<div class="card">
-    <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.option.title_singular') }}
-    </div>
+    <!-- Page Heading -->
+    
 
-    <div class="card-body">
-        <form method="POST" action="{{ route("admin.options.store") }}" enctype="multipart/form-data">
-            @csrf
-            <div class="form-group">
-                <label class="required" for="question_id">{{ trans('cruds.option.fields.question') }}</label>
-                <select class="form-control select2 {{ $errors->has('question') ? 'is-invalid' : '' }}" name="question_id" id="question_id" required>
-                    @foreach($questions as $id => $question)
-                        <option value="{{ $id }}" {{ old('question_id') == $id ? 'selected' : '' }}>{{ $question }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('question_id'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('question_id') }}
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+<!-- Content Row -->
+        <div class="card shadow">
+            <div class="card-header">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">{{ __('create option') }}</h1>
+                    <a href="{{ route('answer.index') }}" class="btn btn-primary btn-sm shadow-sm">{{ __('Go Back') }}</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('answer.store') }}" method="POST">
+                    @csrf
+                    <div class="form-group">
+                        <label for="question">{{ __('question') }}</label>
+                        <select class="form-control" name="question_id" id="question">
+                            @foreach ($questions as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.option.fields.question_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <label class="required" for="option_text">{{ trans('cruds.option.fields.option_text') }}</label>
-                <textarea class="form-control {{ $errors->has('option_text') ? 'is-invalid' : '' }}" name="option_text" id="option_text" required>{{ old('option_text') }}</textarea>
-                @if($errors->has('option_text'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('option_text') }}
+                    <div class="form-group">
+                        <label for="answer_text">{{ __('answer text') }}</label>
+                        <input type="text" class="form-control" id="answer_text" placeholder="{{ __('answer text') }}" name="answer_text" value="{{ old('answer_text') }}" />
                     </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.option.fields.option_text_helper') }}</span>
+
+                    <div class="form-group">
+                        <label for="correct">{{ __('is correct') }}</label>
+                        <input type="checkbox" class="form-control" id="is_correct" name="correct">
+                        </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">{{ __('Save') }}</button>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="points">{{ trans('cruds.option.fields.points') }}</label>
-                <input class="form-control {{ $errors->has('points') ? 'is-invalid' : '' }}" type="number" name="points" id="points" value="{{ old('points') }}" step="1">
-                @if($errors->has('points'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('points') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.option.fields.points_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-danger" type="submit">
-                    {{ trans('global.save') }}
-                </button>
-            </div>
-        </form>
-    </div>
+        </div>
+    
+
+    <!-- Content Row -->
+
 </div>
-
-
-
 @endsection

@@ -112,27 +112,21 @@
                             <a href="{{ route('home') }}" class="nav-item nav-link active">Home</a>
                             <a href="about.html" class="nav-item nav-link">About</a>
                             <a href= "{{ route('course.index') }}" class="nav-item nav-link">Courses</a>
-                            <a href="teacher.html" class="nav-item nav-link">Teachers</a>
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Blog</a>
-                                <div class="dropdown-menu rounded-0 m-0">
-                                    <a href="blog.html" class="dropdown-item">Blog List</a>
-                                    <a href="single.html" class="dropdown-item">Blog Detail</a>
-                                </div>
-                            </div>
                             <a href="{{ route('contact.index') }}" class="nav-item nav-link">Contact</a>
-
-                        </div> 
-
-
-                        
                         @php
     $wishlistCount = session('wishlistCount');
 @endphp
    
-                        <a href="{{ route('wishlist.index') }}" class="wishlist-count-button">
-        Wishlist <span class="count">{{ $wishlistCount }}</span>
+                        <a href="{{ route('wishlist.index') }}" class="nav-item nav-link">Wishlist <span class="count">{{ $wishlistCount }}</span>
     </a>
+                        </div> 
+                        
+
+                        <form method="get" action="{{ route('search') }}">
+                    <input name="q" value="{{request()->get('q')}}"
+                           class="block w-full rounded-md border-0 px-3.5 py-2 t0ext-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 font-medium"
+                           placeholder="search"/>
+                </form>  
 
 
                         <!-- Authentication Links -->
@@ -142,20 +136,19 @@
                                 
                             @endif
                         @else
-                            <a class="nav-item dropdown">
-                                 
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="{{ route('profile')}}" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+
+                        <div class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                                 @if(Auth::user()->avatar)
-                                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" style="border-radius: 50%; height: 40px; width: 40px;">
+                                    <img src="{{ asset('storage/' . Auth::user()->avatar) }}" href="{{ route('profile')}}" alt="Avatar" style="border-radius: 50%; height: 40px; width: 40px;">
                                 @else
-                                    <img src="{{ asset('images/default-avatar.png') }}"  style="border-radius: 50%; height: 40px; width: 40px;">
+                                    <img src="{{ asset('images/default-avatar.png') }}" href="{{ route('profile')}}" style="border-radius: 50%; height: 40px; width: 40px;">
                                 @endif
                                 {{ Auth::user()->first_name }}
                             </a>
-
-
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('profile') }}">
+
+                                <a class="dropdown-item" href="{{ route('profile') }}">
                                         {{ __('Profile') }}
                                     </a>
                                     <a class="dropdown-item" href="{{ url ('My-Courses') }}">
@@ -180,6 +173,8 @@
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
+
+                           
                                 </div></a>
                         @endguest
                     </div>

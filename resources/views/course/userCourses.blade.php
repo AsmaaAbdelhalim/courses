@@ -15,7 +15,7 @@
                    <div class="card-body">
                        <h6 class="card-title">{{ $enrollment->course->name }}</h6>
 
-                       <img class="img-fluid" src="{{ asset('images/' . $enrollment->course->image) }}">
+                       <img class="img-fluid" style="height: 300px; width: 400px;" src="{{ asset('images/' . $enrollment->course->image) }}">
 
                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
                        <a href="{{ route('course.show', [$enrollment->course->id]) }}" class="btn btn-primary">Go To Course</a>

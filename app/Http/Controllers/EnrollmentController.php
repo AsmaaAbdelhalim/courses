@@ -112,7 +112,7 @@ class EnrollmentController extends Controller
         // Enroll the user in the course
         if ($course->price > 0 && !$course->isEnrolledByUser(Auth::user())) {    
 
-            return redirect()->route('session')
+            return redirect()->route('session', $course)
                 ->with('error', 'You are not enrolled in this course.');
         }
         

@@ -9,4 +9,10 @@ class Exam extends Model
 {
     use HasFactory;
     protected $fillable = ['title', 'duration', 'passing_grade', 'total_grade', 'start_at', 'user_id', 'course_id' ];
+
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
 }

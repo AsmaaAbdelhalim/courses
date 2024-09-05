@@ -14,6 +14,10 @@ class Lesson extends Model
         'description',
         'course_id',
         'user_id',
+        'videos',
+        'created_at',
+        'updated_at',
+
         'completed'
     ];
     

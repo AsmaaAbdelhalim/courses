@@ -22,7 +22,7 @@ class WishlistController extends Controller
         $user_wishlist_ids = [];
         if($user){
         $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();}
-        // loop through varible
+        
         $wishlistCourses = Course::whereIn('id', $user_wishlist_ids)->get();
         //dd($wishlistCourses);
         //dd($user_wishlist_ids);
@@ -38,7 +38,6 @@ class WishlistController extends Controller
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please log in to add to wishlist.');
         }
-        // Check if the course is already in the wishlist
         if ($wishlist = Wishlist::where('user_id', Auth::id())->where('course_id', $course->id
         )->first())
         {
@@ -52,13 +51,7 @@ class WishlistController extends Controller
         return redirect()->back()->with('success', 'Course added to wishlist successfully.');
         }
 
-        //$wishlist = Wishlist::create([
-          //  'user_id' => Auth::id(),
-           // 'course_id' => $course->id,
-       // ]);
-
-      ///  return redirect()->back()->with('success', 'Course added to wishlist successfully.');
-   // }
+        
 
     public function removeFromWishlist(Course $course)
     {

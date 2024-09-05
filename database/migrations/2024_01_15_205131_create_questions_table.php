@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
             $table->text('question');
             $table->string('image')->nullable();
             $table->string('video')->nullable();
@@ -31,10 +30,6 @@ return new class extends Migration
             $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
             $table->unsignedBigInteger('lesson_id')->nullable();
             $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
-            $table->unsignedBigInteger('quiz_id')->nullable();
-            $table->foreign('quiz_id')->references('id')->on('quizzes')->onDelete('cascade');
-            $table->unsignedBigInteger('test_id')->nullable();
-            $table->foreign('test_id')->references('id')->on('tests')->onDelete('cascade');
             $table->unsignedBigInteger('exam_id')->nullable();
             $table->foreign('exam_id')->references('id')->on('exams')->onDelete('cascade');
             

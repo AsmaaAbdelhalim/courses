@@ -1,47 +1,65 @@
 @extends('layouts.admin')
+
 @section('content')
+<div class="container-fluid">
 
-<div class="card">
-    <div class="card-header">
-        {{ trans('global.create') }} {{ trans('cruds.question.title_singular') }}
-    </div>
+    <!-- Page Heading -->
+    
 
-    <div class="card-body">
-        <form method="POST" action="{{ route("admin.questions.store") }}" enctype="multipart/form-data">
-            @csrf
-            <div class="form-group">
-                <label class="required" for="category_id">{{ trans('cruds.question.fields.category') }}</label>
-                <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category_id" id="category_id" required>
-                    @foreach($categories as $id => $category)
-                        <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $category }}</option>
-                    @endforeach
-                </select>
-                @if($errors->has('category_id'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('category_id') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.question.fields.category_helper') }}</span>
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+<!-- Content Row -->
+        <div class="card shadow">
+            <div class="card-header">
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">{{ __('create question') }}</h1>
+                    <a href="{{ route('question.index') }}" class="btn btn-primary btn-sm shadow-sm">{{ __('Go Back') }}</a>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="required" for="question_text">{{ trans('cruds.question.fields.question_text') }}</label>
-                <textarea class="form-control {{ $errors->has('question_text') ? 'is-invalid' : '' }}" name="question_text" id="question_text" required>{{ old('question_text') }}</textarea>
-                @if($errors->has('question_text'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('question_text') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.question.fields.question_text_helper') }}</span>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-danger" type="submit">
-                    {{ trans('global.save') }}
-                </button>
-            </div>
-        </form>
-    </div>
+            <div class="card-body">
+            <form action="{{ route('question.store') }}" method="POST">
+
+@csrf
+
+<div class="form-group">
+    <label for="course_id">Course:</label>
+    <select name="course_id" id="course_id" class="form-control" required>
+        @foreach ($courses as $key => $value)
+            <option value="{{ $key }}">{{ $value }}</option>
+        @endforeach
+    </select>
 </div>
 
+<div class="form-group">
+    <label for="exam_id">Exam:</label>
+    <select name="exam_id" id="exam_id" class="form-control" required>
+        @foreach ($exam as $key => $value)
+            <option value="{{ $key }}">{{ $value }}</option>
+        @endforeach
+    </select>
+</div>
 
+<div class="form-group">
+    <label for="question">Question:</label>
+    <textarea name="question" id="question" class="form-control"
+required></textarea>
+</div>
+    <button type="submit" class="btn btn-primary">Create Question</button>
+</form>
+               
+            </div>
+        </div>
+    
 
+    <!-- Content Row -->
+
+</div>
 @endsection

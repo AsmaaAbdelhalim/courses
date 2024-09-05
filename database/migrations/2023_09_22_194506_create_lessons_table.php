@@ -16,18 +16,14 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->integer('duration')->nullable();
-            //$table->string('difficulty')->nullable();
             $table->longText('content')->nullable();
             $table->string('files')->nullable();
             $table->string('links')->nullable();
             $table->string('videos')->nullable();
             $table->string('audios')->nullable();
-            $table->string('images')->nullable();
-            //$table->string('audio')->nullable();
-            //$table->string('pdf')->nullable();
+            $table->string('image')->nullable();
             $table->text('session')->nullable();
             $table->text('summary')->nullable();
-            //$table->string('slug')->unique();
 
             $table->integer('position')->nullable()->unsigned();
             
@@ -43,8 +39,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            //$table->unsignedBigInteger('course_id');
-           // $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
+     
             $table->timestamps();
         });
     }

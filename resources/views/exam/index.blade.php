@@ -1,68 +1,83 @@
-@extends('layouts.client')
+@extends('layouts.admin')  @section('content')
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Test</div>
+<h1>My Exams</h1>
 
-                <div class="card-body">
-                    @if(session('status'))
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="alert alert-success" role="alert">
-                                    {{ session('status') }}
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Duration</th>
+            <th>Start Time</th>
+            <th>Total Grade</th>
+            <th>Passing Grade</th>
+            <th>Questions</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($exams as $exam)
+            <tr>
+                <td>{{ $exam->title }}</td>
+                <td>{{ $exam->duration }} minutes</td>
+                <td>{{ $exam->start_at }}</td>
+                <td>{{ $exam->total_grade }}</td>
+                <td>{{ $exam->passing_grade }}</td>
+                <td>{{ $exam->questions->count() }} </td>
+                <td>{{ $exam->created_at->format('Y-m-d H:i:s') }}</td>
+                <td>
+                    <a href="{{ route('exam.show', $exam->id) }}" class="btn btn-primary">View</a>
+                    <a href="{{ route('exam.edit', $exam->id) }}" class="btn btn-warning">Edit</a> 
 
-                    <form method="POST" action="{{ route('exam.store') }}">
+                    <form action="{{ route('exam.destroy', $exam->id) }}" method="POST" style="display: inline-block">
                         @csrf
-                        @foreach($categories as $category)
-                            <div class="card mb-3">
-                                <div class="card-header">{{ $category->name }}</div>
-                
-                                <div class="card-body">
-                                    @foreach($category->categoryQuestions as $question)
-                                        <div class="card @if(!$loop->last)mb-3 @endif">
-                                            <div class="card-header">{{ $question->question_text }}</div>
-                        
-                                            <div class="card-body">
-                                                <input type="hidden" name="questions[{{ $question->id }}]" value="">
-                                                @foreach($question->questionOptions as $option)
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="questions[{{ $question->id }}]" id="option-{{ $option->id }}" value="{{ $option->id }}"@if(old("questions.$question->id") == $option->id) checked @endif>
-                                                        <label class="form-check-label" for="option-{{ $option->id }}">
-                                                            {{ $option->option_text }}
-                                                        </label>
-                                                    </div>
-                                                @endforeach
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this exam?')">Delete</button> 
 
-                                                @if($errors->has("questions.$question->id"))
-                                                    <span style="margin-top: .25rem; font-size: 80%; color: #e3342f;" role="alert">
-                                                        <strong>{{ $errors->first("questions.$question->id") }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary">
-                                    Submit
-                                </button>
-                            </div>
-                        </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection 
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+//////////////////////////
+
+<h2>Questions</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th>Options</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($questions as $question)
+            <tr>
+                <td>{{ $question->question }}</td>
+                <td>
+                    <ul>
+                        @foreach ($question->options as $option)
+                            <li>{{ $option->option }}</li>
+                        @endforeach
+                    </ul>
+                </td>
+                <td>
+                    <a href="{{ route('question.edit', $question->id) }}" class="btn btn-warning">Edit</a>
+                    <form action="{{ route('question.destroy', $question->id) }}" method="POST" style="display: inline-block">
+                        @csrf
+                        @method('DELETE')
+                        <button 
+ type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this question?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table> 
+
+
+
+
+@endsection

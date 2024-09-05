@@ -24,22 +24,17 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->string('duration')->nullable();
-            //$table->string('rate')->nullable();
             $table->string('image')->nullable();
             $table->string('files')->nullable();
             $table->string('videos')->nullable();
-            $table->text('session')->nullable();
-            //$table->string('category')->nullable();
-            //$table->string('lessons')->nullable();
+      
             $table->integer('status')->nullable();
             $table->string('level')->nullable();
-            $table->string('teachers')->nullable();
+            $table->json('teachers')->nullable();
             $table->string('language')->nullable();
 
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            //$table->unsignedBigInteger('enrollment_id')->nullable();
-            //$table->foreign('enrollment_id')->references('id')->on('enrollments')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

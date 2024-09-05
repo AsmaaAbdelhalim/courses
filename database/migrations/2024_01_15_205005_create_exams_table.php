@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->integer('duration');
             $table->dateTime('start_at')->nullable();
+            $table->dateTime('end_at')->nullable();
             $table->integer('total_grade');
             $table->integer('passing_grade');
             $table->unsignedBigInteger('user_id');

@@ -113,11 +113,11 @@
             @foreach($courses as $course)
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="rounded overflow-hidden mb-2">
-                        <img class="img-fluid" src="{{ asset('images/' . $course->image) }}">
+                        <img class="img-fluid" style="height: 300px; width: 400px;" src="{{ asset('images/' . $course->image) }}">
                         <div class="bg-secondary p-4">
                             <div class="d-flex justify-content-between mb-3">
-                                <small class="m-0"><i class="fa fa-users text-primary mr-2"></i>{{ $course->enrollment_count }} Students</small>
-                                <small class="m-0"><i class="far fa-clock text-primary mr-2"></i>01h 30m</small>
+                                <small class="m-0"><i class="fa fa-users text-primary mr-2"></i>{{ $course->enrollment->count()}} Students</small>
+                                <small class="m-0"><i class="far fa-clock text-primary mr-2"></i>{{ $course->numOfHours}} h </small>
                             </div>
                             <a class="h5" href="{{route ('course.show',[$course->id])}}"><h1>{{$course->name}}</h1></a>
                             <div class="border-top mt-4 pt-4">

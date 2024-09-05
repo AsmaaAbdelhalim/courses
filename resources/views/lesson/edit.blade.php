@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="content-wrapper">
-    <div class="row"> 
+
+<div class="container">
+    <div class="row">
     <div class="col-lg-10 m-auto py-2">
-        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Edit Lesson</h4>
@@ -12,7 +12,7 @@
                 <div class="card-body">
                    <div class="row">
                     <div class="col-md-6">
-                        <form action="{{route('lesson.update',[$lesson->id])}}" method="POST">
+                        <form action="{{route('lesson.update',[$lesson->id])}}" method="POST"enctype="multipart/form-data">
                             @csrf
                             @method('put')
                             {{ method_field('PUT') }}
@@ -43,6 +43,23 @@
                                         @endforeach
                                     </select>
                             </div>
+  
+                            <div class="form-group">
+        <label for="image">Image</label>
+        <input type="file" name="image" id="image" accept="image/*" class="form-control">
+    </div>
+    
+    <div class="form-group">
+        <label for="files">Files</label>
+        <input type="file" name="files" id="files" class="form-control" multiple="multiple" accept=".doc,.docx,.pdf,.ppt,.pptx">
+    </div>
+    <div class="form-group">
+        <label for="videos">Videos</label>
+        <input type="file" name="videos" id="videos" class="form-control" accept=".mp4, .mov, .ogg">
+    </div>
+
+</div>
+
                             
                             <button type="submit" class="btn btn-success">Save</button>
                             <a href="/lesson" class="btn btn-danger">Cancel</a>

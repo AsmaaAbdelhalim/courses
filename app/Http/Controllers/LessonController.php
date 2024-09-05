@@ -8,6 +8,9 @@ use App\Models\Course;
 use App\Models\User;
 use App\Models\Enrollment;
 use App\Models\Course_user;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
 //use Illuminate\Support\Facades\DB;
 
 class LessonController extends Controller
@@ -17,13 +20,8 @@ class LessonController extends Controller
      */
     public function index()
     {
-        //$course = Course::find($course_id);
-        //$lessons = $course->lessons;
         $lessons = Lesson::all();
-        
-        return view('lesson.index', compact('lessons',
-        //'course'
-    ));
+        return view('lesson.index', compact('lessons'));
     }
 
 
@@ -67,7 +65,6 @@ class LessonController extends Controller
         ->where('id', '>', $lesson->id)
         ->orderBy('id')
         ->first();
-
         return view('lesson.show', compact('course', 'lessons','lesson','user', 'previousLesson' ,'nextLesson' ,'userCourse','progress'));
     }
 
@@ -107,7 +104,7 @@ class LessonController extends Controller
             $video = $request->file('videos');
             $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
             $video->move(public_path('videos'), $videoName);
-            $lesson->videos = $videoName;
+            $lesson->videos= $videoName;
         }
 
         if ($request->hasFile('files')) {
@@ -117,11 +114,11 @@ class LessonController extends Controller
             $lesson->files = $fileName;
         }
 
-        if ($request->hasFile('images')) {
-            $image = $request->file('images');
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
             $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $fileName);
-            $lesson->images = $fileName;
+            $lesson->image = $fileName;
         }
 
         $lesson->save();
@@ -178,12 +175,13 @@ class LessonController extends Controller
             $lesson->files = $fileName;
         }
 
-        if ($request->hasFile('images')) {
-            $image = $request->file('images');
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
             $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $fileName);
             $lesson->image = $fileName;
         }
+
         $lesson->save();
 
         return redirect()->route('lesson.index', $lesson->id)->with('success', 'Lesson updated successfully!');

@@ -23,31 +23,12 @@ class CategoryController extends Controller
         return view('category.index', compact('categories'));
     }
 
-    /** */
-
-//     public function index2()
-// {
-//     $categories = Category::all();
-
-//     return view('home', compact('categories'));
-// }
-
-// public function indexw()
-// {
-//     $categories = Category::all();
-
-//     return view('home')->with('categories', $categories);
-// }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-
-
-        $categories  = Category ::all();
-
         return view('category.create');
     }
 

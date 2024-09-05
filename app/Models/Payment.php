@@ -13,6 +13,9 @@ class Payment extends Model
         'user_id',
         'course_id',
         'amount',
+        'total_price',
+        'session_id',
+
     ];
 
 
