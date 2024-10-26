@@ -20,14 +20,10 @@ class ReviewController extends Controller
 
     public function list()
     {
-        $reviews = review::all()->sortByDesc('created_at');
         $reviews = review::latest()->paginate(10);
         return view('review.list', compact('reviews'));
     }
-
-
     
-
     /**
      * Show the form for creating a new resource.
      */

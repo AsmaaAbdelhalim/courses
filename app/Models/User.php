@@ -84,5 +84,10 @@ class User extends Authenticatable
         ->withTimestamps();
     }
 
+    public function courseUsers()
+{
+    return $this->hasMany(Course_user::class);
+}
+
 
 }

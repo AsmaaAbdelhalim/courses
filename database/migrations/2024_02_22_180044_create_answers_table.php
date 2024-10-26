@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
-            $table->text('answer_text');
+            $table->text('answer');
             
             //$table->boolean('is_correct')->default(false);
             $table->tinyInteger('correct')->default(0);

@@ -5,12 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\User;
-use App\Models\Lesson;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
-use Stripe\Stripe;
-use Stripe\PaymentIntent;
 
 class EnrollmentController extends Controller
 {
@@ -42,26 +38,10 @@ class EnrollmentController extends Controller
     /**
      * Display the specified resource.
      */
-    // public function show(User $user)
-    // {
-    //     $enrollment = $user->courses;
-    //     return view('enrollment.show', compact('enrollment'));
-    // }
-
-
-        public function show($enrollment_id)
-        {
-            $enrollment = Enrollment::findOrFail($enrollment_id);
-            if(!$enrollment) {
-                abort(404);
-            }
-            //$user = User::findOrFail($user_id);
-            //$course = Course::findOrFail($enrollment->course_id);
-            $lessons = $enrollment->course->lessons;
-            $completedLessons = $enrollment->user->completedLessons->pluck('id')->toArray();
-     
-            return view('enrollment.show', compact('enrollment', 'user', 'completedLessons', 'course','lessons'));
-        }
+    public function show(string $id)
+    {
+        //
+    }
 
 
     /**
@@ -147,16 +127,6 @@ class EnrollmentController extends Controller
         Enrollment::where('user_id', Auth::id())->where('course_id', $course->id)->delete();
         
         return redirect()->route('course.show', $course)->with('success', 'You have successfully unenrolled from the course.');
-    }
-
-
-    
-    public function mycourses()
-    {
-        $user = User::findOrFail(auth()->id());
-        $enroll = $user->enrollments()->with('course')->get();
- 
-        return view('enrollment.mycourses', ['data' => $enroll]);
     }
 }
 

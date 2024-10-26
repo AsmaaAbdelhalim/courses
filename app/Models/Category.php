@@ -30,4 +30,8 @@ class Category extends Model
         return $this->hasMany(Course::class);
     }
 
+    public function wishlists()
+    {
+        return $this->hasManyThrough(Wishlist::class, Course::class);
+    }
 }

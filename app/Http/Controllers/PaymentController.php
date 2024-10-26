@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Stripe\Stripe;
-use Stripe\Checkout\Session;
+//use Stripe\Stripe;
+//use Stripe\Checkout\Session;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\payment;
-use Illuminate\Console\Scheduling\Event;
+//use Illuminate\Console\Scheduling\Event;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+//use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PaymentController extends Controller
 {
@@ -62,40 +62,24 @@ class PaymentController extends Controller
 
         'success_url' => route('success', [$course->id], true) . "?session_id={CHECKOUT_SESSION_ID}" . "{$course->id}" . "$course->price",
         'cancel_url' => route('course.show', [$course->id]),
+
+        'metadata' => [
+            'course_id' => $course->id,
+            'user_id' => auth()->user()->id,
+        ],
     ]);
+
+
 
     
     return redirect($session->url);
     }
 
     public function success(Request $request, $courseId)
-    {
-        $payment = Payment::where('session_id', $request->session_id)->first();
-
-        $course = Course::findOrFail($courseId);
-        $total_price = $course->price; 
-
-    $payment = Payment::create([
-        'currency' => 'usd',
-        'session_id' => $request->session_id, 
-
-        'user_id' => auth()->user()->id,
-        'course_id' => $courseId,
-        'total_price' => $total_price,
-    ]);
-
-    $payment->save();
-
-    $enrollment = Enrollment::create([
-        'user_id' => Auth::id(),
-        'course_id' => $courseId,
-        
-         
-    ]); 
-    $enrollment->save(); 
-
-    return view('payment.success');
-}
+    {   
+        $course = Course::find($courseId);
+    return view('payment.success',compact('course'));
+    }
 
     public function webhook(Request $request)
     {
@@ -112,30 +96,40 @@ class PaymentController extends Controller
             exit();
         }
 
-        Log::debug('Webhook event', [$event->type]);
+        //Log::debug('Webhook event', [$event->type]);
 
         // Handle the event
         switch ($event->type) {
-            case 'payment_intent.succeeded':
-                $paymentIntent = $event->data->object; // contains a \Stripe\PaymentIntent
-                Log::debug('Payment succeeded', [$paymentIntent->id]);
+            //case 'payment_intent.succeeded':
+                //$paymentIntent = $event->data->object; // contains a \Stripe\PaymentIntent
+                //Log::debug('Payment succeeded', [$paymentIntent->id]);
+                case 'checkout.session.completed':
+                $checkoutSession = $event->data->object;
+                Log::debug('Checkout session completed', [$checkoutSession->id]);
         }
-        // Update payment record and create enrollment
-        $payment = Payment::where('session_id', $paymentIntent->id)->first();
-        if ($payment) {
-            $payment->status = 'success';
-            $payment->save();
 
-            // Create enrollment (assuming Enrollment model)
+        
+
+        //create payment
+        $payment = new Payment();
+        $payment->course_id = $event->data->object->metadata->course_id;
+        $payment->user_id = $event->data->object->metadata->user_id;
+        $payment->total_price = $event->data->object->amount_total;
+        $payment->currency = $event->data->object->currency;
+        $payment->session_id = $event->data->object->id;
+
+        $payment->payment_method = $event->data->object->payment_method;
+            $payment->payment_intent = $event->data->object->payment_intent;
+            $payment->payment_status = $event->data->object->payment_status;
+            $payment->status = $event->data->object->status;
+            $payment->payment_id = $event->data->object->payment_id;
+            $payment->country = $event->data->object->country;
+        $payment->save();
+
             $enrollment = Enrollment::create([
-                'user_id' => Auth::id(), // Replace with your user ID retrieval logic
-                'course_id' => $request->course_id, // Assuming course ID is available
-
-                 
+                'course_id' => $event->data->object->metadata->course_id,
+                'user_id' => $event->data->object->metadata->user_id,
             ]); 
             $enrollment->save(); 
         }
-    }
-    // Handle other Stripe events here if needed
-        
-    }
+    }    

@@ -36,8 +36,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="answer_text">{{ __('answer text') }}</label>
-                        <input type="text" class="form-control" id="answer_text" placeholder="{{ __('answer text') }}" name="answer_text" value="{{ old('answer_text') }}" />
+                        <label for="answer">{{ __('answer') }}</label>
+                        <input type="text" class="form-control" id="answer" placeholder="{{ __('answer') }}" name="answer" value="{{ old('answer') }}" />
                     </div>
 
                     <div class="form-group">

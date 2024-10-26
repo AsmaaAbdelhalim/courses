@@ -15,6 +15,7 @@
     <thead>
         <tr>
             <th>ID</th>
+            <th>Image</th>
             <th>Name</th>
             <th>Price</th>
             <th>Created By</th>
@@ -29,6 +30,8 @@
         @foreach($courses as $course)
         <tr>
             <td>{{ $course->id }}</td>
+            <td><img src="{{ asset('images/'.$course->image) }}" width="50"
+            height="50"></td>
             <td>{{ $course->name }}</td>
             <td>{{ $course->price }}</td>
             <td>{{ $course->user->first_name }}</td>

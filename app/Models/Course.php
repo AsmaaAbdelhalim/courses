@@ -8,7 +8,28 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'price','category_id'];
+    protected $fillable = [
+        'name',
+    'code',
+    'description',
+    'summary',
+    'requirement',
+    'price',
+    'discount',
+    'numOfHours',
+    'started_at',
+    'finished_at',
+    'duration',
+    'image',
+    'files',
+    'videos',
+    'status',
+    'level',
+    'teachers',
+    'language',
+    'category_id',
+    'user_id',
+    ];
 
 
     public function user(){
@@ -63,28 +84,15 @@ public function payments()
     return $this->hasMany(Payment::class);
 }
 
+public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
 
-
-// public function getProgressAttribute()
-// {
-//     return $this->progress()->first();
-// }
-
-// public function getTotalEnrollmentsAttribute()
-// {
-//     return $this->enrollment()->count();
-// }
-
-// public function getTotalReviewsAttribute()
-// {
-//     return $this->reviews()->count();
-// }
-
-// public function getAverageRatingAttribute()
-// {
-//     return $this->reviews()->avg('rating');
-// }
-
+public function exams()
+    {
+        return $this->hasMany(Exam::class);
+    }
 
 
 }

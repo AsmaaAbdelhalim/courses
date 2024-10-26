@@ -9,7 +9,7 @@ This Laravel 10 project aims to provide an online platform for hosting and manag
 - Admin Dashboard: Provide an admin dashboard to manage courses, users, and system settings.
 
 ## Technologies Used
-- Laravel 9
+- Laravel 10
 - PHP
 - MySQL
 - HTML/CSS

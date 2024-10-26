@@ -20,7 +20,7 @@ class Contact extends Model
         'message',
         'country',
         'city',
-        ///'user_id',
+        //'user_id',
     ];
 
     // ...

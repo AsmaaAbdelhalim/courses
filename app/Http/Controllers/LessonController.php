@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreLessonRequest;
+use App\Http\Requests\UpdateLessonRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;  
 use App\Models\Lesson;
@@ -24,49 +27,72 @@ class LessonController extends Controller
         return view('lesson.index', compact('lessons'));
     }
 
-
     public function show($course_id, $lesson_id)
-    {
-        // Check if the user is enrolled in the course
-        $user = Auth::user();
-        $course = Course::findOrFail($course_id);
-        $lessons = Lesson::where('course_id', $course_id)->get();
-        $lesson = Lesson::find($lesson_id);
-        
-        // if (!$course->enrollment(Auth::user())) {
-        //     return redirect()->route('course.show', $course_id)->with('error', 'You are not enrolled in this course.');
-        // }
-        if($user && $lesson)
-        {
-            Course_user::updateOrInsert(
-                ['user_id' => $user->id, 'course_id' => $course_id, 'lesson_id' => $lesson->id],
-            );
+{
+    $user = Auth::user();
+    $course = Course::findOrFail($course_id);
+    $lesson = Lesson::findOrFail($lesson_id);
+
+    if (!Enrollment::where('user_id', $user->id)->where('course_id', $course_id)->exists()) {
+        return redirect()->route('course.show', $course_id)
+            ->with('error', 'You need to enroll in this course to view its lessons.');
+    }
+
+    // Check if the user is enrolled in the course using the enrollment table
+    $isEnrolled = Enrollment::where('user_id', $user->id)
+            ->where('course_id', $course_id)
+            ->exists();
+
+    if (!$isEnrolled) {
+        return redirect()->route('course.show', $course_id)
+        ->with('error', 'You need to enroll in this course to view its lessons.');
         }
-        else
-        {
-            return redirect()->back()->with('error', 'You have not completed this lesson yet.');
-        } 
 
-        $userCourse = $user->lessons()->where('lesson_id', $lesson_id)->first();
-        $userCourse -> pivot-> update(['completed' => 1,]);
+    // Check if the lesson belongs to the course
+    if ($lesson->course_id != $course_id) {
+        return redirect()->route('course.show', $course_id)
+            ->with('error', 'This lesson does not belong to the specified course.');
+    }
 
-        $totalLessons = $course->lessons->count();
-        $completedLessons = $user->lessons->where('course_id', $lesson->course_id)->count();
-        $progress = number_format(( $completedLessons / $totalLessons ) * 100 ) ;
-     
 
-        
-        $previousLesson = Lesson::where('course_id', $lesson->course_id)
+    // Update or insert the course_user record
+    Course_user::updateOrInsert(
+        ['user_id' => $user->id, 'course_id' => $course_id, 'lesson_id' => $lesson->id]
+    );
+
+    // Mark the lesson as completed
+    $user->lessons()->updateExistingPivot($lesson_id, ['completed' => 1]);
+
+    // Calculate progress
+    $totalLessons = $course->lessons->count();
+    $completedLessons = $user->lessons->where('course_id', $lesson->course_id)->count();
+    $progress = number_format(($completedLessons / $totalLessons) * 100);
+
+    // Get previous and next lessons
+    $previousLesson = Lesson::where('course_id', $course_id)
         ->where('id', '<', $lesson->id)
         ->orderBy('id', 'desc')
         ->first();
 
-        $nextLesson = Lesson::where('course_id', $lesson->course_id)
+    $nextLesson = Lesson::where('course_id', $course_id)
         ->where('id', '>', $lesson->id)
         ->orderBy('id')
         ->first();
-        return view('lesson.show', compact('course', 'lessons','lesson','user', 'previousLesson' ,'nextLesson' ,'userCourse','progress'));
-    }
+
+    // Get only the lessons for the current course
+    $lessons = $course->lessons;
+
+    // Get the user's progress for the current course
+    //$userProgress = $user->lessons()->where('course_id', $course_id)->first();
+
+    // Calculate the progress percentage
+    //$progressPercentage = $userProgress ? ($userProgress->pivot->completed / $totalLessons) * 100 : 0;
+     // Check if the user has completed 100% of the lessons
+     //$canStartExam = $progress == 100;
+
+
+    return view('lesson.show', compact('course', 'lessons', 'lesson', 'user', 'previousLesson', 'nextLesson', 'progress'));
+}
 
     /**
      *  
@@ -91,7 +117,7 @@ class LessonController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreLessonRequest $request)
     {
         $user_id = Auth::id();
         $lesson = new Lesson;
@@ -152,7 +178,7 @@ class LessonController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateLessonRequest $request, string $id)
     {
         $lesson = Lesson::findOrFail($id);
         $user_id = Auth::id();

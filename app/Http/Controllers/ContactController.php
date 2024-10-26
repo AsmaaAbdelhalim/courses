@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreContactRequest;
 use Illuminate\Http\Request;
 
 use App\Models\Contact;
@@ -28,24 +29,14 @@ class ContactController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreContactRequest $request)
     {
-        
+        Contact::create($request->validated());
+        return redirect()->route('contact.index') 
+        ->with('success', 'Thank you for contacting us. We will contact you shortly.');
 
-        $contact = new Contact();
-        $contact->name = $request->name;
-        $contact->email = $request->email;
-        $contact->subject = $request->subject;
-        $contact->phone = $request->phone;
-        $contact->message = $request->message;
-        $contact->country = $request->country;
-        $contact->city = $request->city;
-        //$contact->user_id = Auth::user()->id;
-        $contact->save();
-        Contact::create($request->all());
-  
-        return redirect()->back()
-                         ->with(['success' => 'Thank you for contact us. we will contact you shortly.']);
+
+        //return redirect()->back()->with(['success' => 'Thank you for contact us. we will contact you shortly.']);
     }
 
     /**
@@ -82,22 +73,7 @@ class ContactController extends Controller
 
         public function list()
     {
-        $contacts = Contact::all()->sortByDesc('created_at');
         $contacts = Contact::latest()->paginate(10);
         return view('contact.list', compact('contacts'));
-    }
-
-    public function showContactForm()
-    {
-        return view('contact');
-    }
-
-    public function submitContactForm(Request $request)
-    {
-        // Process the submitted form data
-        // Send email, store data in the database, etc.
-
-        // Redirect the user back to the contact form with a success message
-        return redirect()->route('contact.form')->with('success', 'Message sent successfully!');
     }
 }

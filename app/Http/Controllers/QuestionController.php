@@ -7,8 +7,7 @@ use App\Models\Exam;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
+use App\Models\Answer;
 class QuestionController extends Controller
 {
     /**
@@ -25,18 +24,9 @@ class QuestionController extends Controller
      */
     public function create()
     { 
-            $courses = Course::where('user_id', Auth::user()->id)->pluck('name', 'id')->prepend('Please select', '');
-            $exam = Exam::where('user_id', Auth::user()->id)->pluck('title', 'id')->prepend('Please select', '');
-
-        $correct_options = [
-            'option1' => 'Option #1',
-            'option2' => 'Option #2',
-            'option3' => 'Option #3',
-            'option4' => 'Option #4',
-            'option5' => 'Option #5'
-        ];
-
-        return view('question.create', compact(['correct_options'] , 'courses' , 'exam'));
+        $courses = Course::where('user_id', Auth::user()->id)->pluck('name', 'id')->prepend('Please select', '');
+        $exam = Exam::where('user_id', Auth::user()->id)->pluck('title', 'id')->prepend('Please select', '');
+        return view('question.create', compact('courses' , 'exam'));
     }
 
     /**
@@ -45,70 +35,37 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-           
-            'question' => 'required|string',
-            //'image' => 'nullable|image',
-            //'video' => 'nullable|string',
-            //'level' => 'nullable|string',
-            'duration' => 'nullable|integer',
-            'total_grade' => 'nullable|integer',
-            'passing_grade' => 'nullable|integer',
-
-            //'answers' => 'required',
-            //'answers.*.answer_text' => 'required|string',
-            //'correct' => 'required',
+            'exam_id' => 'required|exists:exams,id',
+            'question' => 'required|string|max:255',
+            'answers' => 'required|array',
+            'answers.*.text' => 'required|string|max:255',
+            'answers.*.correct' => 'sometimes|boolean',
         ]);
-        
 
         $question = new Question();
+        $question->exam_id = $validatedData['exam_id'];
         $question->question = $validatedData['question'];
-        //$question->image = $validatedData['image'];
-        //$question->video = $validatedData['video'];
-        //$question->level = $validatedData['level'];
-        //$question->duration = $validatedData['duration'];
-        //$question->total_grade = $validatedData['total_grade'];
-        //$question->passing_grade = $validatedData['passing_grade'];
-        //$question->correct_option = $validatedData['correct_option'];
-        $question->course_id = $request->course_id;
-        $question->exam_id = $request->exam_id;
-        $question->user_id = Auth::user()->id;
+        $question->user_id = Auth::id();
         $question->save();
 
-        // $answers = $request->input('answers', []);
-        // foreach ($answers as $answerData) {
-        //     $question->answers()->create([
-        //         'answer_text' => $answerData['answer_text'],
-        //         'correct' => $answerData['correct'],
-        //         'user_id' => Auth::user()->id, // Assuming you're using authentication
-        //     ]);
-        // } 
-        //     foreach ($validatedData['answers'] as $answerData) {
-        //     $question->answers()->create([
-        //         'answer' => $answerData['answer_text'],
-        //         'correct' => $answerData['correct'],
-        //         'user_id' => Auth::user()->id
-        //     ]);
-        // }
+        foreach ($validatedData['answers'] as $index => $answerData) {
+            $answer = new Answer();
+            $answer->question_id = $question->id;
+            $answer->answer = $answerData['text'];
+            $answer->correct = isset($answerData['correct']) ? 1 : 0;
+            $answer->user_id = Auth::id();
+            $answer->save();
+        }
 
-        //$question = $validatedData['exam']->questions()->create($validatedData);
-
-        //foreach ($validatedData['answers'] as $answerData) {
-        //    $question->answers()->create($answerData);
-        //}
-        return redirect()->route('question.index')->with('success', 'Question created successfully.');
-    }
-
+}
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        
-            $courses = Course::get()->pluck('title', 'id')->prepend('Please select', '');
-      
-
         $question = Question::findOrFail($id);
-
+        $courses = Course::pluck('title', 'id')->prepend('Please select', '');
+        
         return view('question.show', compact('question','courses'));
     }
 

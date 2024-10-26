@@ -18,21 +18,17 @@ class WishlistController extends Controller
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $user = auth()->user();
-        $user_wishlist_ids = [];
-        if($user){
-        $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();}
-        
+        /** @var User $user */
+        $user = Auth()->User();
+        $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();
         $wishlistCourses = Course::whereIn('id', $user_wishlist_ids)->get();
         //dd($wishlistCourses);
         //dd($user_wishlist_ids);
 //dd($wishlistCourses);
-        return view('wishlist.index', compact('wishlistCourses','user'));
+        return view('wishlist.index', compact('wishlistCourses','user', 'user_wishlist_ids'));
 
     }
-
-
-
+ 
     public function addToWishlist(Course $course)
     {
         if (!Auth::check()) {
@@ -44,10 +40,14 @@ class WishlistController extends Controller
             return redirect()->back()->with('error', 'Course already in wishlist.');
         }
       
-        $wishlist = new Wishlist;
-        $wishlist->user_id = Auth::id();
-        $wishlist->course_id = $course->id;
-        $wishlist->save();
+        // if (Wishlist::where('user_id', Auth::id())->where('course_id', $course->id)->exists()) {
+        //     return redirect()->back()->with('error', 'Course already in wishlist.');
+        // }
+
+        Wishlist::create([
+            'user_id' => Auth::id(),
+            'course_id' => $course->id,
+        ]);
         return redirect()->back()->with('success', 'Course added to wishlist successfully.');
         }
 
@@ -112,8 +112,6 @@ class WishlistController extends Controller
      */
     public function destroy(string $id)
     {
-        $course = Course::find($id);
-        Auth::user()->wishlist()->detach($course);
-        return redirect()->back()->with('success', 'Course removed from wishlist successfully.');
+        //
     }
 }

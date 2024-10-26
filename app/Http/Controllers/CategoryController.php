@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\StoreCategoryRequest;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Category;
-use App\Models\Course;
-use App\Models\User;
 
 class CategoryController extends Controller
 {
@@ -16,10 +16,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all()->sortByDesc('created_at');
-        $categories = Category::latest()->paginate(10);
-        $categories = Category::withCount('course')->get();
-
+        $categories = Category::withCount('courses')->latest()->paginate(10);
         return view('category.index', compact('categories'));
     }
 
@@ -37,25 +34,22 @@ class CategoryController extends Controller
      */
 
 
-    public function store(Request $request)
-{
-    $user_id = Auth::id();
-    $category = new Category();
-    $category->user_id = $user_id;
-    $category->name = $request->input('name');
-    $category->description = $request->input('description');
+    public function store(StoreCategoryRequest $request)
+    {
+        $category = new Category($request->validated());
+        $category->user_id = Auth::id();
 
-    if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path('images'), $fileName);
-        $category->image = $fileName;
+        if ($request->hasFile('image')) {
+            $this->deleteAssociatedFile($category->image);
+            $image = $request->file('image');
+
+            $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $fileName);
+            $category->image = $fileName;
+            }
+        $category->save();
+        return redirect()->route('category.index')->with('success', 'Category created successfully');
     }
-    
-    $category->save();
-    
-    return redirect()->route('category.index');
-}
 
     /**
      * Display the specified resource.
@@ -67,10 +61,9 @@ class CategoryController extends Controller
         $creator = $category->user;
 
         $user = Auth::user();
-        $user_wishlist_ids = [];
-        if($user){
-        $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();}
-        return view('category.show', compact(['category','creator','courses', 'user_wishlist_ids']));
+        $user_wishlist_ids = $user ? $user->wishlists()->pluck('course_id')->toArray() : [];
+
+        return view('category.show', compact('category', 'creator', 'courses', 'user_wishlist_ids'));
     }
 
     /**
@@ -86,25 +79,21 @@ class CategoryController extends Controller
      * Update the specified resource in storage.
      */
 
-    public function update(Request $request, $id)
-{
-    $category = Category::find($id);
-    $category->name = $request->input('name');
-    $category->description = $request->input('description');
+    public function update(UpdateCategoryRequest $request, $id)
+    {
+        $category = Category::findOrFail($id);
+        $category->update($request->validated());
 
-    if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path('images'), $fileName);
-        $category->image = $fileName;
-    }
-    
-    $category->save();
-    
-    return redirect()->route('category.index');
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            //$this->deleteAssociatedFile($category->image);
+            $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $fileName);
+            $category->image = $fileName;
+            }
+        $category->save();
+        return redirect()->route('category.index')->with('success', 'Category updated successfully');
 }
-
-
 
     /**
      * Remove the specified resource from storage.
@@ -112,21 +101,21 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $category = Category::findOrFail($id);
+        $this->deleteAssociatedFile($category->image);
         $category->delete();
 
         return redirect()->route('category.index')->with('success', 'Category deleted successfully!');
     }
-    /**
-     * 
-     *
-     */
 
-public function courses()
-{
+    private function deleteAssociatedFile(?string $filename)
+    {
+        if ($filename) {
+           $filePath = public_path('images/' . $filename);
+           if (file_exists($filePath)) {
+            unlink($filePath);
+            }
+            
+        }
+    }
 
-    $categories = Category::all();
-
-return view('category.courses', compact('categories'));
-
-}
 }

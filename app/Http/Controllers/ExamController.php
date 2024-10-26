@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreExamRequest;
+use App\Http\Requests\UpdateExamRequest;
+use App\Models\Answer;
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\Course_user;
 use App\Models\Exam;
 use App\Models\Lesson;
 use App\Models\Question;
+use App\Models\Result;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ExamController extends Controller
 {
@@ -17,13 +23,37 @@ class ExamController extends Controller
      */
     public function index()
     {
-        $exams = Exam::latest()->paginate(10);
-        $exams = Exam::withCount('questions')->get();
-
+        $exams = Exam::withCount('questions')->latest()->paginate(10);
         $questions = Question::inRandomOrder()->limit(10)->get();
-        foreach ($questions as &$question) {
-        $question->options = Question::where('id', $question->id)->inRandomOrder()->get();
-        }
+
+        foreach ($questions as $question) {
+            $question->options = Answer::where('question_id', $question->id)->inRandomOrder()->get();
+       
+
+          //  $exams = Exam::withCount('questions')->latest()->paginate(10);
+        //$questions = Question::inRandomOrder()->limit(10)->get()->each(function ($question) {
+          //  $question->options = Answer::where('question_id', $question->id)->inRandomOrder()->get();
+        //});
+
+    //     $questions = Question::inRandomOrder()->limit(10)->get();
+    //     foreach ($questions as &$question) {
+    //     $question->options = Question::where('id', $question->id)->inRandomOrder()->get();
+    //     }
+
+
+
+    //         // Retrieve exams with their question count, paginated
+    // $exams = Exam::withCount('questions')->latest()->paginate(10);
+    
+    // // Retrieve 10 random questions
+    // $questions = Question::inRandomOrder()->limit(10)->get();
+    
+    // // Attach random options to each question
+    // foreach ($questions as &$question) {
+    //     $question->options = Answer::where('question_id', $question->id)->inRandomOrder()->get();
+     }   
+
+
        return view('exam.index', compact('questions', 'exams'));
 
     }
@@ -33,15 +63,10 @@ class ExamController extends Controller
      */
     public function create()
     {
-                 $course = Course::where('user_id', Auth::user()->id);
-                 $courses_ids = $course->pluck('id');
-                 $courses = $course->pluck('name', 'id')->prepend('Please select', '');
-                 $lessons = Lesson::whereIn('course_id', $courses_ids)->get()->pluck('title', 'id')->prepend('Please select', '');
-
-         $categories = Category::where('user_id', Auth::user()->id)->pluck('name', 'id')->prepend('Please select', '');
-        // $courses = Course::where('user_id', Auth::user()->id)->pluck('name', 'id')->prepend('Please select', '');
-        // $lessons = Lesson::where('user_id', Auth::user()->id)->pluck('title', 'id')->prepend('Please select', '');
-
+        $userId = Auth::id();
+        $courses = Course::where('user_id', $userId)->pluck('name', 'id')->prepend('Please select', '');
+        $lessons = Lesson::whereIn('course_id', $courses->keys())->pluck('title', 'id')->prepend('Please select', '');
+        $categories = Category::where('user_id', $userId)->pluck('name', 'id')->prepend('Please select', '');
         return view('exam.create', compact('courses', 'lessons', 'categories'));
         
     }
@@ -49,7 +74,7 @@ class ExamController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreExamRequest $request)
     {
         $request->validate([
             'title' => 'required',
@@ -77,10 +102,9 @@ class ExamController extends Controller
      */
     public function show(string $id)
     {
-        $exam = Exam::find($id);
-        $questions = $exam->questions();
-
-        return view('exam.show', compact('exam','questions'));
+        $exam = Exam::with('questions')->findOrFail($id);
+        //$exam->load('questions');
+        return view('exam.show', compact('exam'));
     }
 
     /**
@@ -95,9 +119,8 @@ class ExamController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateExamRequest $request, string $id)
     {
-        
         $request->validate([
             'title' => 'required',
             'duration' => 'required',
@@ -130,77 +153,47 @@ class ExamController extends Controller
     *
     */
 
-    public function addQuestion(Request $request, $examId)
-    {
-        $question = Question::create([
-            'exam_id' => $examId,
-            'question_text' => $request->input('question_text'),
-            'correct_answer' => $request->input('correct_answer'),
-        ]);
-    
-        return redirect()->route('exam.show', ['examId' => $examId]);
-    }
-
     /*
     *
     */
+
     public function startExam($examId)
     {
-        $exam = Exam::with('questions')->find($examId);
-        $questions = $exam->questions();
-        //student take exam and view questions of exam
-        
+        $exam = Exam::with('questions')->findOrFail($examId);
+        $user = Auth::user();
 
-        return view('exam.start', compact('exam','questions'));
-    }
-
-    /*
-    *
-    */
-    public function submitExam(Request $request, $examId)
-    {
-        $exam = Exam::with('questions')->find($examId);
-        // Calculate the result based on the submitted answers (not implemented in this example)
-    
-        $result = 0;
-        foreach ($exam->questions as $question) {
-            if ($request->input('question_' . $question->id) == $question->correct
-            && $request->input('question_' . $question->id) != null) {
-                $result++;
-                }
-                }
-                // Save the result in the database
-                $exam->result = $result;
-                $exam->save();
-                //return redirect()->route('exam.show', ['examId' => $examId]);
-        
-        // For demonstration purposes, we are returning a success message
-        return view('exam.submit', ['message' => 'Exam submitted successfully']);
-    }
-
-    public function takeExam(Request $request)
-{
-    // Logic to take the exam, calculate the result, and store the result in the database
-
-    $result = 75; // Example result, calculate the actual result
-
-    if ($result >= 80) {
-        // User passed the exam
-        // Send certificate via email
-        // Redirect user to success page
-    } else {
-        // User failed the exam
-        // Check if user has retake attempts left
-        $retakeAttempts = $request->user()->retake_attempts ?? 0;
-
-        if ($retakeAttempts < 3) {
-            // User can retake the exam
-            $request->user()->update(['retake_attempts' => $retakeAttempts + 1]);
-            // Redirect user to retake exam page
-        } else {
-            // User has used all retake attempts
-            // Redirect user to failure page
+        if (!$this->canUserStartExam($user, $exam)) {
+            return redirect()->back()->with('error', 'You cannot start this exam yet. Please complete the course first.');
         }
+
+            // Check if the user has already passed this exam
+        $passedResult = Result::where('user_id', $user->id)
+        ->where('exam_id', $exam->id)
+        ->where('passed', true)
+        ->first();
+        if ($passedResult) {
+            return redirect()->route('exam.index')->with('error', 'You have already passed this exam.');
+        }
+        // Check the number of attempts
+        $attempts = Result::where('user_id', $user->id)
+            ->where('exam_id', $exam->id)
+            ->count();
+
+        if ($attempts >= 3) {
+            return redirect()->route('exam.index')->with('error', 'You have reached the maximum number of attempts for this exam.');
+        }
+        $questions = $exam->questions()->inRandomOrder()->get();
+
+        return view('exam.start', compact('exam', 'questions'));
     }
-}
+
+    private function canUserStartExam($user, $exam)
+    {
+        //$course = $exam->course;
+        $courseUser = Course_user::where('user_id', $user->id)
+            //->where('course_id', $course->id)
+            ->where('course_id', $exam->course_id)
+            ->first();
+        return $courseUser && $courseUser->completed;
+    }
 }

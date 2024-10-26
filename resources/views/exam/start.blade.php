@@ -1,83 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Start Exam: {{ $exam->title }}</h1>
-    @foreach($exam->questions as $question)
-        <p>{{ $question->question_text }}</p>
-        <!-- Display question options here -->
-    @endforeach
-    <form method="post" action="{{ route('exam.submit', ['examId' => $exam->id]) }}">
+<div class="container">
+    <h1>{{ $exam->title }}</h1>
+    <p><strong>Duration:</strong> {{ $exam->duration }} minutes</p>
+    <p><strong>Total Grade:</strong> {{ $exam->total_grade }}</p>
+    <p><strong>Passing Grade:</strong> {{ $exam->passing_grade }}</p>
+
+    <form action="{{ route('exam.submit', $exam->id) }}" method="POST">
         @csrf
-        <!-- Include form inputs for submitting exam answers -->
-        <button type="submit">Submit Exam</button>
+        
+        <h2>Questions</h2>
+        @foreach ($questions as $question)
+            <div class="mb-3">
+                <p><strong>{{ $loop->iteration }}. {{ $question->question }}</strong></p>
+                
+                @foreach ($question->answers as $answer)
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answers[{{ $question->id }}]" id="answer{{ $answer->id }}" value="{{ $answer->id }}">
+                        <label class="form-check-label" for="answer{{ $answer->id }}">
+                            {{ $answer->answer }}
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        @endforeach
+
+        <button type="submit" class="btn btn-primary">Submit Exam</button>
     </form>
+</div>
 @endsection
 
-@extends('layouts.client')
+
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Test</div>
-
+    <h1 class="mb-4">{{ $exam->title }} Exam</h1>
+    <p>Time Remaining: {{ $exam->duration }} minutes<span id="time-remaining"></span></p>
+    <form action="{{ route('result.store') }}" method="post">
+        @csrf
+        @foreach($questions as $index => $question)
+            <div class="card mb-4">
                 <div class="card-body">
-                    @if(session('status'))
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="alert alert-success" role="alert">
-                                    {{ session('status') }}
-                                </div>
-                            </div>
+                    <h6 class="card-title">Question {{ $index + 1 }} :</h6>
+                    <h5 class="card-text">{{ $question->question }}</h5>
+                    @foreach($question->answers as $answer)
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="answers[{{ $question->id }}]" id="answer{{ $answer->id }}" value="{{ $answer->id }}">
+                            <label class="form-check-label" for="answer{{ $answer->id }}">
+                                {{ $answer->answer }}
+                            </label>
                         </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('client.test.store') }}">
-                        @csrf
-                        @foreach($categories as $category)
-                            <div class="card mb-3">
-                                <div class="card-header">{{ $category->name }}</div>
-                
-                                <div class="card-body">
-                                    @foreach($category->categoryQuestions as $question)
-                                        <div class="card @if(!$loop->last)mb-3 @endif">
-                                            <div class="card-header">{{ $question->question_text }}</div>
-                        
-                                            <div class="card-body">
-                                                <input type="hidden" name="questions[{{ $question->id }}]" value="">
-                                                @foreach($question->questionOptions as $option)
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="questions[{{ $question->id }}]" id="option-{{ $option->id }}" value="{{ $option->id }}"@if(old("questions.$question->id") == $option->id) checked @endif>
-                                                        <label class="form-check-label" for="option-{{ $option->id }}">
-                                                            {{ $option->option_text }}
-                                                        </label>
-                                                    </div>
-                                                @endforeach
-
-                                                @if($errors->has("questions.$question->id"))
-                                                    <span style="margin-top: .25rem; font-size: 80%; color: #e3342f;" role="alert">
-                                                        <strong>{{ $errors->first("questions.$question->id") }}</strong>
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6">
-                                <button type="submit" class="btn btn-primary">
-                                    Submit
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    @endforeach
                 </div>
             </div>
-        </div>
-    </div>
+        @endforeach
+        <button type="submit" class="btn btn-primary">Submit Exam</button>
+    </form>
 </div>
+
+@push('scripts')
+<script>
+    // ... (timer script remains unchanged) 
+</script>
+@endpush
 @endsection

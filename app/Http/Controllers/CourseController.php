@@ -1,19 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateCourseRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Course;
 use App\Models\User;
 use App\Models\Category;
-use App\Models\Enrollment;
-use App\Models\Lesson;
-use App\Models\Review;
-use App\Models\Wishlist;
-use App\Models\Payment;
 use Carbon\Carbon;
-//use Illuminate\Pagination\LengthAwarePaginator;
-
-
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -27,18 +23,15 @@ class CourseController extends Controller
     {
         $categories = Category::all();
 
+         /** @var User $user */
         $user = Auth::user();
+        $user_wishlist_ids = $user ? $user->wishlists()->pluck('course_id')->toArray() : [];
 
-        $user_wishlist_ids = [];
-        if($user){
-        $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();}
-        //dd($user_wishlist_ids);
+         //dd($user_wishlist_ids);
         $categories = Category::with('courses')->get();
-        $courses = Course::all()->sortByDesc('created_at');
-        $courses = Course::latest()->paginate(12);
-        $courses = Course::withCount('lessons')->get();
-        
-        $courses = Course::withCount('enrollment')->get();
+        $courses = Course::withCount(['lessons', 'enrollment'])
+            ->latest()
+            ->paginate(12);
       
         return view('course.index',compact(['courses','categories' , 'user_wishlist_ids']));
     }  
@@ -49,10 +42,9 @@ class CourseController extends Controller
 
     public function list()
     {
-        $courses = Course::all();
-        $courses = Course::withCount('lessons')->get();
-        $courses = Course::withCount('wishlists')->get();
-        $courses = Course::withCount('enrollment')->get();
+        //$courses = Course::all();
+
+        $courses = Course::withCount(['lessons', 'wishlists', 'enrollment'])->get();
         return view('course.list', compact('courses'));
     }
 
@@ -70,55 +62,41 @@ class CourseController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCourseRequest $request)
     {
-        $user_id = Auth::id();
-        $course = new Course;
-        $course->user_id = $user_id;
-        $course->category_id =request('category_id');
-        $course->name = request('name');
-        $course->price = request('price');
-        $course->description = request('description');
-        $course->code = request('code');
-        $course->summary = request('summary');
-        $course->description = request('description');
-        $course->requirement = request('requirement');
-        $course->discount = request('discount');
-        $course->numOfHours = request('numOfHours');
-        $course->started_at = request('started_at');
-        $course->finished_at = request('finished_at');
-        $course->duration = request('duration');
-        
-        $course->status = request('status');
+        //$validated = $request->validated();
+        //$course->fill($validated);
 
-        if ($request->hasFile('videos')) {
-            $video = $request->file('videos');
-            $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $video->move(public_path('videos'), $videoName);
-            $course->videos= $videoName;
-        }
-
-        if ($request->hasFile('files')) {
-            $file = $request->file('files');
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('files'), $fileName);
-            $course->files = $fileName;
-        }
-        
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $fileName);
-            $course->image = $fileName;
-        }
-
-        $teachers = User::where('role', '2');
-        $course->teachers = request('teachers');
-        
-        $course->save();
-        return redirect()->route('course.index')->with('success','Course has been created');
+        $course = new Course($request->validated());
+        $course->user_id = Auth::id();
+          
+            if ($request->hasFile('videos')) {
+                $video = $request->file('videos');
+                $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
+                $video->move(public_path('videos'), $videoName);
+                $course->videos= $videoName;
+            }
+    
+            if ($request->hasFile('files')) {
+                $file = $request->file('files');
+                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('files'), $fileName);
+                $course->files = $fileName;
+            }
+            
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images'), $fileName);
+                $course->image = $fileName;
+            }
+    
+            //$teachers = User::where('role', '2');
+            //$course->teachers = request('teachers');
+            
+            $course->save();
+            return redirect()->route('course.index')->with('success','Course has been created');
     }
-
     /**
      * Display the specified resource.
      */
@@ -130,6 +108,15 @@ class CourseController extends Controller
         $categories = Category::all();
         $user = Auth::id();
         //dd($user, $course->users());
+
+
+
+
+        //        $course->load('reviews');
+        //$creator = $course->user;
+        //$categories = Category::all();
+        //$user = Auth::id();
+
         
         return view('course.show', compact('course','creator','categories','user' ));
     }
@@ -160,56 +147,65 @@ class CourseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCourseRequest $request, string $id)
     {
-        $request->validate([
-            'videos' => 'required|file|mimes:mp4,mov,avi', // Adjust MIME types as needed
-        ]);
         $course = Course::findorfail($id);
-        $user_id = Auth::id();
-        $course->user_id = $user_id;
-        $course->name = request('name');
-        $course->price = request('price');
-        $course->category_id =request('category_id');
-        $course->description = request('description');
-        $course->code = request('code');
-        $course->summary = request('summary');
-        $course->description = request('description');
-        $course->requirement = request('requirement');
-        $course->discount = request('discount');
-        $course->numOfHours = request('numOfHours');
-        $course->started_at = request('started_at');
-        $course->finished_at = request('finished_at');
-        $course->duration = request('duration');
-        $course->files = request('files');
-        $course->videos = request('videos');
-        $course->session = request('session');
-        $course->status = request('status');
+        $data = $request->validated();
 
-        if ($request->hasFile('videos')) {
-            $video = $request->file('videos');
-            $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
-            $video->move(public_path('videos'), $videoName);
-            $course->videos= $videoName;
-        }
+        $this->handleFileUpload($request, $course, 'videos');
+        $this->handleFileUpload($request, $course, 'files');
+        $this->handleFileUpload($request, $course, 'image');
 
-        if ($request->hasFile('files')) {
-            $file = $request->file('files');
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('files'), $fileName);
-            $course->files = $fileName;
-        }
+        $course->update($data);
+
+        // $request->validate([
+        //     'videos' => 'required|file|mimes:mp4,mov,avi', // Adjust MIME types as needed
+        // ]);
+        // $course = Course::findorfail($id);
+        // $user_id = Auth::id();
+        // $course->user_id = $user_id;
+        // $course->name = request('name');
+        // $course->price = request('price');
+        // $course->category_id =request('category_id');
+        // $course->description = request('description');
+        // $course->code = request('code');
+        // $course->summary = request('summary');
+        // $course->description = request('description');
+        // $course->requirement = request('requirement');
+        // $course->discount = request('discount');
+        // $course->numOfHours = request('numOfHours');
+        // $course->started_at = request('started_at');
+        // $course->finished_at = request('finished_at');
+        // $course->duration = request('duration');
+        // $course->files = request('files');
+        // $course->videos = request('videos');
+        // $course->session = request('session');
+        // $course->status = request('status');
+
+        // if ($request->hasFile('videos')) {
+        //     $video = $request->file('videos');
+        //     $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
+        //     $video->move(public_path('videos'), $videoName);
+        //     $course->videos= $videoName;
+        // }
+
+        // if ($request->hasFile('files')) {
+        //     $file = $request->file('files');
+        //     $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        //     $file->move(public_path('files'), $fileName);
+        //     $course->files = $fileName;
+        // }
         
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $fileName);
-            $course->image = $fileName;
-        }
-        $teachers = User::where('role, 2');
-        $course->teachers = request('teachers');
+        // if ($request->hasFile('image')) {
+        //     $image = $request->file('image');
+        //     $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+        //     $image->move(public_path('images'), $fileName);
+        //     $course->image = $fileName;
+        // }
+         $teachers = User::where('role, 2');
+         $course->teachers = request('teachers');
 
-        $course->save();
+         $course->save();
 
         return redirect()->route('course.index')->with('success','Course updated successfully!');
     }
@@ -220,8 +216,11 @@ class CourseController extends Controller
     public function destroy(string $id)
     {
         $course = Course::findorfail($id);
+        $this->deleteFile($course->videos);
+        $this->deleteFile($course->files);
+        $this->deleteFile($course->image);
         $course->delete();
-        return view ('course.index', compact('courses'));
+        return view ('course.index');
     }
 
 
@@ -245,14 +244,39 @@ class CourseController extends Controller
         $courses = Course::query()
             //->where('active', '=', true)
             ->whereDate('created_at', '<=', Carbon::now())
-            ->orderBy('created_at', 'desc')
             ->where(function ($query) use ($q) {
                 $query->where('name', 'like', "%$q%")
                     ->orWhere('description', 'like', "%$q%");
             })
+            ->latest()
             ->paginate(10);
 
-        return view('course.search', compact('courses'));
+            $user = Auth::user();
+            $user_wishlist_ids = $user ? $user->wishlists()->pluck('course_id')->toArray() : [];
+    
+        return view('course.search', compact('courses', 'user_wishlist_ids'));
+    }
+
+    private function handleFileUpload($request, $course, $field)
+    {
+        if ($request->hasFile($field)) {
+            $this->deleteFile($course->$field);
+
+            $file = $request->file($field);
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path($field), $fileName);
+            $course->$field = $fileName;
+        }
+    }
+
+    private function deleteFile($fileName)
+    {
+        if ($fileName) {
+            $filePath = public_path($fileName);
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
+        }
     }
 
 }
