@@ -9,7 +9,7 @@ class Course extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name',
+    'name',
     'code',
     'description',
     'summary',
@@ -32,6 +32,10 @@ class Course extends Model
     ];
 
 
+    //protected $casts = [
+    //    'price' => 'decimal:2',
+    //    'status' => 'boolean'
+    //];
     public function user(){
         return $this->belongsTo(User::class);
     }

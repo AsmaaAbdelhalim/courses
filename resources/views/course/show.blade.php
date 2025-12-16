@@ -128,7 +128,7 @@
             <p>You are already enrolled in this course.</p>
             <form action="{{ route('unenroll', $course) }}" method="POST">
             {{ csrf_field() }}
-                            {{method_field('PUT')}}
+                            {{method_field('DELETE')}}
                 @csrf
                 <button type="submit" class="btn btn-info "
             style="width:20%">Unenroll</button>
@@ -138,7 +138,7 @@
 
             <form action="{{ route('enroll', $course) }}" method="POST">
             {{ csrf_field() }}
-                            {{method_field('PUT')}}
+                            {{method_field('POST')}}
                 @csrf
                 <button type="submit" class="btn btn-info "
             style="width:20%">Enroll</button>
@@ -170,7 +170,7 @@
                         @foreach ($course->reviews as $review)
                         <div class="media mb-4">
 
-                                @if(Auth::user()->avatar)
+                                @if(Auth::check() && Auth::user()->avatar)
                                     <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" style="border-radius: 50%; height: 40px; width: 40px;">
                                 @else
                                     <img src="{{ asset('images/default-avatar.png') }}"  style="border-radius: 50%; height: 40px; width: 40px;">

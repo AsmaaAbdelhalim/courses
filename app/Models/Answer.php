@@ -11,7 +11,10 @@ class Answer extends Model
     protected $fillable = [
         'user_id',
         'question_id',
+        'exam_id',
+        'course_id',
         'answer',
+        'correct'
         ];
 
         public function question(){

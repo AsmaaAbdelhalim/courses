@@ -6,10 +6,6 @@ use App\Models\Category;
 use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 
-// use App\Models\User;
-// use App\Models\Lesson;
-// use App\Models\Course_user;
-
 class HomeController extends Controller
 {
     /**
@@ -32,7 +28,8 @@ class HomeController extends Controller
         $categories = Category::latest()->take(12)->get();
         $courses = Course::latest()->take(12)->get();
         $recentFreeCourses = Course::where('price', 0)->latest()->take(8)->get();
-        
+
+        /** @var User $user */
         $user_wishlist_ids = Auth::check() ? Auth::user()->wishlists()->pluck('course_id')->all() : [];
         return view('home', compact('categories', 'courses', 'recentFreeCourses', 'user_wishlist_ids' ));       
     } 

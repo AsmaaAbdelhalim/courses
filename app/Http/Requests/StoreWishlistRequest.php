@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class StoreCategoryRequest extends FormRequest
+class StoreWishlistRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,17 +23,20 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'course_id' => 'required|exists:courses,id',
+            'user_id' => 'required|exists:users,id'
         ];
     }
 
+     /**
+     * Get the validated data with additional fields.
+     */
     protected function prepareForValidation(): void
     {
+        $courseId = $this->route('course')->id;
         $this->merge([
         'user_id' => Auth::id(),
+        'course_id' => $courseId,
         ]);
     }
 }

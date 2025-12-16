@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\CourseService;
+use App\Services\FileService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +13,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(FileService::class);
+        
+        $this->app->singleton(CourseService::class, function ($app) {
+           return new CourseService($app->make(FileService::class));
+        });
     }
 
     /**

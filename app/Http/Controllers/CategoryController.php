@@ -8,9 +8,17 @@ use App\Http\Requests\StoreCategoryRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Services\CategoryService;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
+    private CategoryService $categoryService;
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -36,30 +44,32 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $category = new Category($request->validated());
-        $category->user_id = Auth::id();
+        try {
+            $category = $this->categoryService->create(
+                $request->validated(),
+                $request
+            );
 
-        if ($request->hasFile('image')) {
-            $this->deleteAssociatedFile($category->image);
-            $image = $request->file('image');
-
-            $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $fileName);
-            $category->image = $fileName;
-            }
-        $category->save();
-        return redirect()->route('category.index')->with('success', 'Category created successfully');
+            return redirect()
+                ->route('category.index', $category)
+                ->with('success', 'Category created successfully');
+                
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to create category');
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Category $category)
     {
-        $category = Category::findOrFail($id);
         $courses = $category->courses()->paginate(12);
         $creator = $category->user;
 
+        /** @var User $user */
         $user = Auth::user();
         $user_wishlist_ids = $user ? $user->wishlists()->pluck('course_id')->toArray() : [];
 
@@ -69,9 +79,8 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Category $category)
     {
-        $category = Category::findOrFail($id);
         return view('category.edit', compact('category'));
     }
 
@@ -79,28 +88,31 @@ class CategoryController extends Controller
      * Update the specified resource in storage.
      */
 
-    public function update(UpdateCategoryRequest $request, $id)
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $category = Category::findOrFail($id);
-        $category->update($request->validated());
+        try {
+            $category = $this->categoryService->update(
+                $category,
+                $request->validated(),
+                $request
+            );
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            //$this->deleteAssociatedFile($category->image);
-            $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $fileName);
-            $category->image = $fileName;
-            }
-        $category->save();
-        return redirect()->route('category.index')->with('success', 'Category updated successfully');
-}
+            return redirect()
+                ->route('category.index', $category)
+                ->with('success', 'Category updated successfully');
+                
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to update category');
+        }
+    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Category $category)
     {
-        $category = Category::findOrFail($id);
         $this->deleteAssociatedFile($category->image);
         $category->delete();
 

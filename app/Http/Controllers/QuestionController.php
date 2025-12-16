@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreQuestionRequest;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Answer;
+use Illuminate\Support\Facades\Log;
+
 class QuestionController extends Controller
 {
     /**
@@ -32,32 +35,47 @@ class QuestionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreQuestionRequest $request)
     {
-        $validatedData = $request->validate([
-            'exam_id' => 'required|exists:exams,id',
-            'question' => 'required|string|max:255',
-            'answers' => 'required|array',
-            'answers.*.text' => 'required|string|max:255',
-            'answers.*.correct' => 'sometimes|boolean',
+        Log::info($request->validated());
+        $question = Question::create([
+            'exam_id' => $request->validated('exam_id'),
+            'course_id' => $request->validated('course_id'),
+            'question' => $request->validated('question'),
+            'image' => $request->validated('image'),
+            'video' => $request->validated('video'),
+            'user_id' => Auth::id()
         ]);
-
-        $question = new Question();
-        $question->exam_id = $validatedData['exam_id'];
-        $question->question = $validatedData['question'];
-        $question->user_id = Auth::id();
-        $question->save();
-
-        foreach ($validatedData['answers'] as $index => $answerData) {
-            $answer = new Answer();
-            $answer->question_id = $question->id;
-            $answer->answer = $answerData['text'];
-            $answer->correct = isset($answerData['correct']) ? 1 : 0;
-            $answer->user_id = Auth::id();
-            $answer->save();
+        foreach ($request->answers as $answerData) {
+            Answer::create([
+                'exam_id' => $request->validated('exam_id'),
+                'course_id' => $request->validated('course_id'),
+                'question_id' => $question->id,
+                'answer' => $answerData['answer'],
+                'correct' => isset($answerData['correct']) ? 1 : 0,
+                'user_id' => Auth::id()
+            ]);
         }
+        if($request->hasfile('image'))
+        {
+            $image = $request->file('image');
+            $filename = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $filename);
+            $question->image = $filename;
+            $question->save();
+            Storage::delete($question->video);
+            }
+            if($request->hasfile('video'))
+            {
+                $video = $request->file('video');
+                $filename = time().'.'.$video->getClientOriginalExtension();
+                $video->move(public_path('videos'), $filename);
+                $question->video = $filename;
+                $question->save();
+                Storage::delete($question->image);
+                } 
 
-}
+    }
     /**
      * Display the specified resource.
      */

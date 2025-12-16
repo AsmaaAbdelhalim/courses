@@ -75,26 +75,9 @@ class ExamController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreExamRequest $request)
-    {
-        $request->validate([
-            'title' => 'required',
-            'duration' => 'required',
-            'start_at' => 'required',
-            'total_grade' => 'required',
-            'passing_grade' => 'required',
-            'course_id' => 'required',
-        ]);
-
-        $exam = new Exam();
-        $exam->title = $request->title;
-        $exam->duration = $request->duration;
-        $exam->start_at = $request->start_at;
-        $exam->total_grade = $request->total_grade;
-        $exam->passing_grade = $request->passing_grade;
-        $exam->user_id = Auth::id();
-        $exam->course_id = $request->course_id;
-        $exam->category_id = $request->category_id;
-        $exam->save();
+    {    
+        Exam::create($request->validated());
+        return redirect()->route('exam.index')->with('success', 'Exam created successfully');
     }
 
     /**
@@ -103,8 +86,11 @@ class ExamController extends Controller
     public function show(string $id)
     {
         $exam = Exam::with('questions')->findOrFail($id);
+
+        $course = $exam->course;
+        //$course = Course::findOrFail($exam->course_id);
         //$exam->load('questions');
-        return view('exam.show', compact('exam'));
+        return view('exam.show', compact('exam', 'course'));
     }
 
     /**
@@ -121,6 +107,7 @@ class ExamController extends Controller
      */
     public function update(UpdateExamRequest $request, string $id)
     {
+
         $request->validate([
             'title' => 'required',
             'duration' => 'required',
@@ -142,9 +129,8 @@ class ExamController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Exam $exam)
     {
-        $exam = Exam::find($id);
         $exam->delete();
         return redirect()->route('exam.index');
     }

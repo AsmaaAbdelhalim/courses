@@ -40,7 +40,7 @@
             <li><strong>Duration:</strong> {{ $exam->duration }} minutes</li>
             <li><strong>Total Grade:</strong> {{ $exam->total_grade }}</li>
             <li><strong>Passing Grade:</strong> {{ $exam->passing_grade }}</li>
-            <li><strong>Category:</strong> {{ $exam->category->name }}</li>
+            <li><strong>Category:</strong> {{ $exam->category}}</li>
             <li><strong>Course:</strong> {{ $exam->course->name }}</li>
         </ul>
     </div>
@@ -121,6 +121,7 @@
                     <form action="{{ route('question.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="exam_id" value="{{ $exam->id }}">
+                        <input type="hidden" name="course_id" value="{{ $exam->course->id }}">
 
                         <div class="form-group">
                             <label for="question">{{ __('Question') }}</label>
@@ -133,19 +134,20 @@
                         </div>
                         <div class="form-group">
                             <label for="video">{{ __('Video') }}</label>
-                            <input type="text" name="video" class="form-control">
+                            <input type="file" name="video" class="form-control-file">
                         </div>
                         <div id="answers">
         <div class="form-group answer-group">
             <label for="answer_0">Answer 1</label>
-            <input type="text" class="form-control" id="answer_0" name="answers[0][text]" required>
+            <input type="text" class="form-control" id="answer_0" name="answers[0][answer]" required>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="correct_0" name="answers[0][correct]" value="1">
                 <label class="form-check-label" for="correct_0">Correct</label>
             </div>
         </div>
     </div>
-    <button type="button" id="addAnswer"  class="btn btn-secondary mt-2">Add Answer</button>                     <button type="submit" class="btn btn-primary">Add Question</button>
+    <button type="button" id="addAnswer"  class="btn btn-secondary mt-2">Add Answer</button>                     
+    <button type="submit" class="btn btn-primary">Add Question</button>
                     </form>
                 </div>
             </div>
@@ -153,15 +155,14 @@
     </div>
 
     <script>
-
-document.getElementById('addAnswer').addEventListener('click', function() {
+        document.getElementById('addAnswer').addEventListener('click', function() {
         var answersDiv = document.getElementById('answers');
         var answerCount = answersDiv.children.length;
         var newAnswer = document.createElement('div');
         newAnswer.className = 'form-group answer-group';
         newAnswer.innerHTML = `
             <label for="answer_${answerCount}">Answer ${answerCount + 1}</label>
-            <input type="text" class="form-control" id="answer_${answerCount}" name="answers[${answerCount}][text]" required>
+            <input type="text" class="form-control" id="answer_${answerCount}" name="answers[${answerCount}][answer]" required>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="correct_${answerCount}" name="answers[${answerCount}][correct]" value="1">
                 <label class="form-check-label" for="correct_${answerCount}">Correct</label>

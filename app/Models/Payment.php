@@ -15,7 +15,12 @@ class Payment extends Model
         'amount',
         'total_price',
         'session_id',
-
+        'payment_intent',
+        'currency',
+        'country',
+        'payment_id',
+        'payment_status',
+        'status',
     ];
 
 

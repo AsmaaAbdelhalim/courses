@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreResultRequest;
 use Illuminate\Http\Request;
 use App\Models\Result;
 use App\Models\Exam;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ResultController extends Controller
 {
@@ -22,11 +24,15 @@ class ResultController extends Controller
         return view('result.show', compact('result'));
     }
 
-    public function submitExam(Request $request, $examId)
+    public function submitExam(StoreResultRequest $request, $examId)
     {
+        if ($request->fails()) {
+            dd($request->errors()); // This will show any validation issues
+        }
+       // Using validated data
         $exam = Exam::with('questions.answers')->findOrFail($examId);
         $user = Auth::user();
-
+   
         // Check if the user has already passed this exam
         $existingResult = Result::where('user_id', $user->id)
             ->where('exam_id', $exam->id)
@@ -36,7 +42,7 @@ class ResultController extends Controller
         if ($existingResult) {
             return redirect()->route('exam.index')->with('error', 'You have already passed this exam.');
         }
-
+      
         // Check the number of attempts
         $attempts = Result::where('user_id', $user->id)
             ->where('exam_id', $exam->id)
@@ -47,7 +53,7 @@ class ResultController extends Controller
         }
 
         // Process the exam
-        $studentAnswers = $request->input('answers');
+        //$studentAnswers = $request->input('answers');
         $correctAnswers = 0;
         $totalQuestions = $exam->questions->count();
 
@@ -62,14 +68,18 @@ class ResultController extends Controller
         $passed = $score >= $exam->passing_grade;
 
         // Create the result
-        $result = Result::create([
-            'user_id' => $user->id,
-            'exam_id' => $exam->id,
-            'score' => $score,
-            'correct_answers' => $correctAnswers,
-            'passed' => $passed,
-        ]);
 
+    // Create the result record
+    $result = Result::create(
+        [
+            'exam_id' => $request->validated('exam_id'),
+            'score' => $request->validated('score'),
+            'correct_answers' => $request->validated('correct_answers'),
+            'passed' => $request->validated('passed'),
+            'user_id' => Auth::id()
+            ]
+    );
+        
         if ($passed) {
             return $this->generateCertificate($result);
         }

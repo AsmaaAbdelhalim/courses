@@ -129,8 +129,8 @@
             </div>
             <div class="row">
             @foreach($recentFreeCourses as $course)
-@include('layouts.course')
-                </div>@endforeach
+            @include('layouts.course')
+            @endforeach
             </div>
         </div>
     </div>

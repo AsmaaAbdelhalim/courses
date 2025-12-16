@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreReviewRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Review;
@@ -35,22 +37,9 @@ class ReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreReviewRequest $request)
     {
-        $validatedData = $request->validate([
-            'rating' => 'required|numeric|min:1|max:5',
-            'review' => 'required|max:255',
-        ]);
-
-        $review = new Review;
-        $review->rating = $validatedData['rating'];
-        $review->review = $validatedData['review'];
-
-        $review->course_id = $request->course_id;
-        $review->user_id = Auth::user()->id;
-
-        $review->save();
-
+        Review::create($request->validated());
         return redirect()->back()->with('success', 'Review created successfully!');
     }
 
@@ -65,32 +54,17 @@ class ReviewController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit()
     {
-        $review = Review::findOrFail($id);
-
-        return view('reviews.edit', compact('review'));
+        //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(string $id)
     {
-        $validatedData = $request->validate([
-            'rating' => 'required|numeric|min:1|max:5',
-            'comment' => 'required|max:255',
-            // Add any other validation rules for your review fields
-        ]);
-
-        $review = Review::findOrFail($id);
-        $review->rating = $validatedData['rating'];
-        $review->comment = $validatedData['comment'];
-        // Update any other review fields here
-
-        $review->save();
-
-        return redirect()->back()->with('success', 'Review updated successfully!');
+        //
     }
 
     /**
@@ -98,9 +72,6 @@ class ReviewController extends Controller
      */
     public function destroy(string $id)
     {
-        $review = Review::findOrFail($id);
-        $review->delete();
-
-        return redirect()->back()->with('success', 'Review deleted successfully!');
+        //
     }
 }

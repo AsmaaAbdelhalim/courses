@@ -8,8 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Exam extends Model
 {
     use HasFactory;
-    protected $fillable = ['title', 'duration', 'passing_grade', 'total_grade', 'start_at', 'user_id', 'course_id' ];
+    protected $fillable = ['title', 'duration', 'passing_grade', 'total_grade', 'start_at', 'user_id', 'course_id', 'category_id' ];
 
+
+    // protected $casts = [
+    //     'total_grade' => 'integer',
+    // ]; 
 
     public function questions()
     {

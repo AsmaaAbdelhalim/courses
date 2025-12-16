@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreWishlistRequest;
 use Illuminate\Http\Request;
 use App\Models\Wishlist;
 use App\Models\Course;
@@ -15,43 +16,26 @@ class WishlistController extends Controller
      */
     public function index()
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
+        // $user = Auth::user();
+        // if (!auth()->check()) {
+        //     return redirect()->route('login');
+        // }
         /** @var User $user */
-        $user = Auth()->User();
+        $user = Auth::user();
         $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();
         $wishlistCourses = Course::whereIn('id', $user_wishlist_ids)->get();
-        //dd($wishlistCourses);
-        //dd($user_wishlist_ids);
-//dd($wishlistCourses);
         return view('wishlist.index', compact('wishlistCourses','user', 'user_wishlist_ids'));
 
     }
  
-    public function addToWishlist(Course $course)
-    {
+    public function addToWishlist(StoreWishlistRequest $request)
+    { 
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please log in to add to wishlist.');
         }
-        if ($wishlist = Wishlist::where('user_id', Auth::id())->where('course_id', $course->id
-        )->first())
-        {
-            return redirect()->back()->with('error', 'Course already in wishlist.');
-        }
-      
-        // if (Wishlist::where('user_id', Auth::id())->where('course_id', $course->id)->exists()) {
-        //     return redirect()->back()->with('error', 'Course already in wishlist.');
-        // }
-
-        Wishlist::create([
-            'user_id' => Auth::id(),
-            'course_id' => $course->id,
-        ]);
+        Wishlist::create($request->validated());
         return redirect()->back()->with('success', 'Course added to wishlist successfully.');
-        }
-
-        
+    }
 
     public function removeFromWishlist(Course $course)
     {

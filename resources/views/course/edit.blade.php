@@ -83,7 +83,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="exampleInputImage" class="form-label">Image</label>
-                                <input type="file"  name="image" class="@error('image') is-invalid @enderror form-control" value="{{$course->image}}">
+                                <input type="file"  name="image" class="@error('image') is-invalid @enderror form-control" value="{{$course->image}}" accept="image/*">
                                 @error('image')
                                 <div class="alert alert-danger mt-1 mb-1">Enter Your Image</div>
                                 @enderror
@@ -127,16 +127,14 @@
                             </div>
                             <div class="form-group">
                                 <lable for="exampleInputFiles">Files</label>
-                                <input type="file" name="files[]" multiple class="@error('files') is-invalid @enderror form-control" id
-                                    ="exampleInputFiles">
+                                <input type="file" name="files[]" multiple class="@error('files') is-invalid @enderror form-control" id="exampleInputFiles">
                                 @error('files')
                                 <div class="alert alert-danger mt-1 mb-1">Enter Your Files</div>
                                 @enderror
                             </div>
                             <div class="form-group">
                                 <label for="exampleInputVideos">Videos</label>
-                                <input type="file" name="videos[]" multiple class="@error('videos') is-invalid @enderror form-control" id
-                                    ="exampleInputVideos">
+                                <input type="file" name="videos[]" multiple class="@error('videos') is-invalid @enderror form-control" id="exampleInputVideos" accept="video/*" >
                                 @error('videos')
                                 <div class="alert alert-danger mt-1 mb-1">Enter Your Videos</div>
                                 @enderror

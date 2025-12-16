@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('session_id')->nullable();
             $table->string('total_price');
             $table->string('currency')->nullable();
-            $table->string('payment_method')->nullable();
+            //$table->string('payment_method')->nullable();
             $table->string('payment_intent')->nullable();
             $table->string('payment_status')->nullable();
             $table->string('status')->nullable();

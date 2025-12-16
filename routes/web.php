@@ -57,10 +57,10 @@ Route::middleware('role:0')->group (function(){
 });
 Route::middleware(['auth'])->group(function () {
 });
-Route::post('/course/{course}/enroll', [EnrollmentController::class, 'enroll'])->name('enrollpost');
-Route::put('/course/{course}/enroll', [EnrollmentController::class, 'enroll'])->name('enroll');
-Route::post('/course/{course}/unenroll', [EnrollmentController::class, 'unenroll'])->name('unenrollpost');
-Route::put('/course/{course}/unenroll', [EnrollmentController::class, 'unenroll'])->name('unenroll'); 
+//Route::post('/course/{course}/enroll', [EnrollmentController::class, 'enroll'])->name('enrollpost');
+Route::post('/course/{course}/enroll', [EnrollmentController::class, 'enroll'])->name('enroll');
+//Route::post('/course/{course}/unenroll', [EnrollmentController::class, 'unenroll'])->name('unenrollpost');
+Route::delete('/course/{course}/unenroll', [EnrollmentController::class, 'unenroll'])->name('unenroll'); 
 
     Route::resource('category',CategoryController::class)->only(['index', 'edit', 'show', 'create', 'store','update', 'destroy','courses']);
     Route::resource('lesson', LessonController::class)->only(['list', 'index', 'create','edit', 'store','update', 'destroy']);
@@ -107,7 +107,6 @@ Route::any('webhook', [PaymentController::class, 'webhook'])->name('webhook');
 //Route::post('/payment/store', [PaymentController::class, 'store'])->name('payment.store');
 
 Route::get('/payment/list', 'App\Http\Controllers\PaymentController@list')->name('payment.list');
-Route::get('/checkout/{course}', [PaymentController::class, 'checkout'])->name('payment.checkout');
 Route::get('/success/{course}', 'App\Http\Controllers\PaymentController@success')->name('success');
 
 

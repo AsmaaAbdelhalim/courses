@@ -93,6 +93,15 @@
 
     <button type="submit" class="btn btn-success">Create Course</button>
     <a href="/course" class="btn btn-danger">Cancel</a>
+    @if($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach($errors->all() as $error)
+            <li>{{$error}}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
 </form>
 
                     </div>

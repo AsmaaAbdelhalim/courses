@@ -5,47 +5,40 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\User;
 use App\Models\Category;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\File;
-use Illuminate\Http\Request;
+use App\Services\CourseService;
+use Illuminate\Http\RedirectResponse;
 
 class CourseController extends Controller
 {
+    private CourseService $courseService;
+
+    public function __construct(CourseService $courseService)
+    {
+        $this->courseService = $courseService;
+    }
+
     /**
      * Display a listing of the resource.
      */
-
-
     public function index()
     {
-        $categories = Category::all();
-
-         /** @var User $user */
+        /** @var User $user */
         $user = Auth::user();
         $user_wishlist_ids = $user ? $user->wishlists()->pluck('course_id')->toArray() : [];
 
-         //dd($user_wishlist_ids);
+        //'user_wishlist_ids' => auth()->user()?->wishlists()->pluck('course_id')->toArray() ?? []
+
+        $courses = Course::withCount(['lessons', 'enrollment'])->latest()->paginate(12);
         $categories = Category::with('courses')->get();
-        $courses = Course::withCount(['lessons', 'enrollment'])
-            ->latest()
-            ->paginate(12);
-      
-        return view('course.index',compact(['courses','categories' , 'user_wishlist_ids']));
-    }  
 
-    /*
-    *
-    */
-
-    public function list()
-    {
-        //$courses = Course::all();
-
-        $courses = Course::withCount(['lessons', 'wishlists', 'enrollment'])->get();
-        return view('course.list', compact('courses'));
+        //$courses = Course::with(['category', 'user'])
+        //->latest()
+        //->paginate(12);
+        return view('course.index', compact('courses', 'categories', 'user_wishlist_ids'));
     }
 
     /**
@@ -53,230 +46,87 @@ class CourseController extends Controller
      */
     public function create()
     {
-        //$teachers = User::role('2');
-     
+        $categories = Category::all();
         $teachers = User::where('role', '2')->get();
-        $categories  = Category ::all();
-        return view('course.create', compact('categories','teachers'));
+        return view('course.create', compact('categories', 'teachers'));
     }
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCourseRequest $request)
+    public function store(StoreCourseRequest $request): RedirectResponse
     {
-        //$validated = $request->validated();
-        //$course->fill($validated);
+        try {
+            $course = $this->courseService->create(
+                $request->validated(),
+                $request
+            );
 
-        $course = new Course($request->validated());
-        $course->user_id = Auth::id();
-          
-            if ($request->hasFile('videos')) {
-                $video = $request->file('videos');
-                $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
-                $video->move(public_path('videos'), $videoName);
-                $course->videos= $videoName;
-            }
-    
-            if ($request->hasFile('files')) {
-                $file = $request->file('files');
-                $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('files'), $fileName);
-                $course->files = $fileName;
-            }
-            
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('images'), $fileName);
-                $course->image = $fileName;
-            }
-    
-            //$teachers = User::where('role', '2');
-            //$course->teachers = request('teachers');
-            
-            $course->save();
-            return redirect()->route('course.index')->with('success','Course has been created');
+            return redirect()
+                ->route('course.index', $course)
+                ->with('success', 'Course created successfully');
+                
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to create course');
+        }
     }
+
     /**
-     * Display the specified resource.
+     * Show the specified resource.
      */
     public function show(string $id)
     {
-        $course = Course::findOrFail($id);
-        $creator = $course->user;
-        $course = Course::with('reviews')->findOrFail($id);
-        $categories = Category::all();
-        $user = Auth::id();
-        //dd($user, $course->users());
-
-
-
-
-        //        $course->load('reviews');
-        //$creator = $course->user;
-        //$categories = Category::all();
-        //$user = Auth::id();
-
-        
-        return view('course.show', compact('course','creator','categories','user' ));
-    }
-
-
-    public function userCourses()
-    {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
-          $user = Auth::user();
-          $enrollments = $user->enrollments;
-
-          return view('course.userCourses', compact('user','enrollments'));
+        $course = Course::with('reviews', 'user')->findOrFail($id);
+        return view('course.show', [
+            'course' => $course,
+            'categories' => Category::all(),
+            'user' => Auth::id(),
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Course $course)
     {
-        $course = Course::findorfail($id);
-        $teachers = User::where('role', '2')->get();
         $categories = Category::all();
-        return view('course.edit', compact('course','categories', 'teachers'));
+        $teachers = User::where('role', '2')->get();
+        return view('course.edit', compact('course', 'categories', 'teachers'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCourseRequest $request, string $id)
+    public function update(UpdateCourseRequest $request, Course $course): RedirectResponse
     {
-        $course = Course::findorfail($id);
-        $data = $request->validated();
+        try {
+            $this->courseService->update(
+                $course,
+                $request->validated(),
+                $request
+            );
 
-        $this->handleFileUpload($request, $course, 'videos');
-        $this->handleFileUpload($request, $course, 'files');
-        $this->handleFileUpload($request, $course, 'image');
+            return redirect()
+                ->route('course.index', $course)
+                ->with('success', 'Course updated successfully');
+                
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to update course');
+        }
 
-        $course->update($data);
-
-        // $request->validate([
-        //     'videos' => 'required|file|mimes:mp4,mov,avi', // Adjust MIME types as needed
-        // ]);
-        // $course = Course::findorfail($id);
-        // $user_id = Auth::id();
-        // $course->user_id = $user_id;
-        // $course->name = request('name');
-        // $course->price = request('price');
-        // $course->category_id =request('category_id');
-        // $course->description = request('description');
-        // $course->code = request('code');
-        // $course->summary = request('summary');
-        // $course->description = request('description');
-        // $course->requirement = request('requirement');
-        // $course->discount = request('discount');
-        // $course->numOfHours = request('numOfHours');
-        // $course->started_at = request('started_at');
-        // $course->finished_at = request('finished_at');
-        // $course->duration = request('duration');
-        // $course->files = request('files');
-        // $course->videos = request('videos');
-        // $course->session = request('session');
-        // $course->status = request('status');
-
-        // if ($request->hasFile('videos')) {
-        //     $video = $request->file('videos');
-        //     $videoName = time() . '_' . uniqid() . '.' . $video->getClientOriginalExtension();
-        //     $video->move(public_path('videos'), $videoName);
-        //     $course->videos= $videoName;
-        // }
-
-        // if ($request->hasFile('files')) {
-        //     $file = $request->file('files');
-        //     $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('files'), $fileName);
-        //     $course->files = $fileName;
-        // }
-        
-        // if ($request->hasFile('image')) {
-        //     $image = $request->file('image');
-        //     $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-        //     $image->move(public_path('images'), $fileName);
-        //     $course->image = $fileName;
-        // }
-         $teachers = User::where('role, 2');
-         $course->teachers = request('teachers');
-
-         $course->save();
-
-        return redirect()->route('course.index')->with('success','Course updated successfully!');
+        return redirect()->route('course.index')->with('success', 'Course updated successfully!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Course $course)
     {
-        $course = Course::findorfail($id);
-        $this->deleteFile($course->videos);
-        $this->deleteFile($course->files);
-        $this->deleteFile($course->image);
         $course->delete();
-        return view ('course.index');
+        return redirect()->route('course.index')->with('success', 'Course deleted successfully!');
     }
-
-
-    public function getMostEnrolledCourses()
-    {
-        $mostEnrolledCourses = Course::select('name', 'enrollment_count')
-            ->where('category', 'laravel')
-            ->orderByDesc('enrollment_count')
-            ->limit(4)
-            ->get();
-
-        // return $mostEnrolledCourses;
-        return view('home', compact('mostEnrolledCourses'));
-
-    }
-
-    public function search(Request $request)
-    {
-        $q = $request->get('q');
-
-        $courses = Course::query()
-            //->where('active', '=', true)
-            ->whereDate('created_at', '<=', Carbon::now())
-            ->where(function ($query) use ($q) {
-                $query->where('name', 'like', "%$q%")
-                    ->orWhere('description', 'like', "%$q%");
-            })
-            ->latest()
-            ->paginate(10);
-
-            $user = Auth::user();
-            $user_wishlist_ids = $user ? $user->wishlists()->pluck('course_id')->toArray() : [];
-    
-        return view('course.search', compact('courses', 'user_wishlist_ids'));
-    }
-
-    private function handleFileUpload($request, $course, $field)
-    {
-        if ($request->hasFile($field)) {
-            $this->deleteFile($course->$field);
-
-            $file = $request->file($field);
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path($field), $fileName);
-            $course->$field = $fileName;
-        }
-    }
-
-    private function deleteFile($fileName)
-    {
-        if ($fileName) {
-            $filePath = public_path($fileName);
-            if (File::exists($filePath)) {
-                File::delete($filePath);
-            }
-        }
-    }
-
 }

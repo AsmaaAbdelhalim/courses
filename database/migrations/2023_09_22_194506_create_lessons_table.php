@@ -25,16 +25,16 @@ return new class extends Migration
             $table->text('session')->nullable();
             $table->text('summary')->nullable();
 
-            $table->integer('position')->nullable()->unsigned();
+            //$table->integer('position')->nullable()->unsigned();
             
             
-            $table->timestamp('published_at')->nullable();
+            //$table->timestamp('published_at')->nullable();
 
             $table->unsignedBigInteger('course_id');
             $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
 
-            $table->boolean('completed')->default(false);
-            $table->timestamp('completed_at')->nullable();
+            //$table->boolean('completed')->default(false);
+            //$table->timestamp('completed_at')->nullable();
             
 
             $table->unsignedBigInteger('user_id');

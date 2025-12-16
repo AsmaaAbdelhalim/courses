@@ -22,23 +22,25 @@ class StoreLessonRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id' => 'required|integer|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'duration' => 'nullable|integer|min:1',
             'content' => 'nullable|longText',
-            'files' => 'nullable|string',
             'links' => 'nullable|string',
-            'videos' => 'nullable|string',
             'audios' => 'nullable|string',
-            'image' => 'nullable|string',
             'session' => 'nullable|string',
             'summary' => 'nullable|string',
             'position' => 'nullable|integer',
             'published_at' => 'nullable|date',
             'course_id' => 'required|exists:courses,id',
-            'user_id' => 'required|exists:users,id',
+            //'user_id' => 'required|exists:users,id',
             'completed' => 'nullable|boolean',
             'completed_at' => 'nullable|date',
+            //'image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'files' => 'nullable|file|mimes:pdf,docx',
+            'videos' => 'nullable|file|mimes:mp4,mov,avi',
+            'audios' => 'nullable|file',
         ];
     }
 }

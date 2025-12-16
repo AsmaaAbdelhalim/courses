@@ -42,7 +42,7 @@
 <body>
     <div class="certificate">
         <h1>Certificate of Completion</h1>
-        <h2>This certificate</h2>
+        <h2>This certificate that</h2>
         <h1>{{ $user->first_name }}
             {{ $user->last_name }}</h1>
         <h2>has successfully completed the exam:</h2>

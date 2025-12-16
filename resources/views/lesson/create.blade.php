@@ -14,6 +14,16 @@
                     <div class="col-md-6">
                         <form action="{{route('lesson.store')}}" method="POST" enctype="multipart/form-data">
                             {{ csrf_field() }}
+
+                            @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                             <div class="form-group">
                                     <label for="exampleInputTitle" class="form-label">Title</label>
                                     <input type="text"  name="title" class="@error('title') is-invalid @enderror form-control" >

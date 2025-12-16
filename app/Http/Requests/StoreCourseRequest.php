@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreCourseRequest extends FormRequest
 {
@@ -31,27 +32,25 @@ class StoreCourseRequest extends FormRequest
             'discount' => 'nullable|integer|min:0',
             'numOfHours' => 'nullable|integer|min:0',
             'started_at' => 'nullable|date',
-            'finished_at' => 'nullable|date',
+            'finished_at' => 'nullable|date|after_or_equal:started_at',
             'duration' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Adjust size as needed
+            'image' => 'nullable|image|mimes:jpg,jpeg,png',
             'files' => 'nullable|file|mimes:pdf,docx',
             'videos' => 'nullable|file|mimes:mp4,mov,avi',
-            'status' => 'nullable|integer', // Assuming status can be an integer
+            'status' => 'nullable|integer',
             'level' => 'nullable|string',
-            'teachers' => 'nullable|array', // Assuming teachers is an array
-            'teachers.*' => 'exists:users,id', // Assuming teachers are user IDs
+            'teachers' => 'nullable|array',
+            'teachers.*' => 'exists:users,id',
             'language' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id', // Ensure category exists    
+            'category_id' => 'required|exists:categories,id',
+            'user_id' => 'required|exists:users,id'
         ];
     }
-
-    public function messages()
+    protected function prepareForValidation(): void
     {
-        return [
-            //'name.required' => 'The course name is required.',
-            //'code.unique' => 'The course code must be unique.',
-            // Add any other custom messages here
-            
-        ];
+        $this->merge([
+        'user_id' => Auth::id(),
+        //'category_id' => $this->route('category')->id,
+        ]);
     }
 }

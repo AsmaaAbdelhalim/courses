@@ -33,14 +33,15 @@ class UpdateCourseRequest extends FormRequest
             'numOfHours' => 'sometimes|required|integer',
             'started_at' => 'sometimes|required|date',
             'finished_at' => 'sometimes|required|date|after:started_at',
-            'duration' => 'sometimes|required|integer',
+            'duration' => 'nullable|string',
             'status' => 'sometimes|required|in:active,inactive',
             'teachers' => 'sometimes|required|array',
             'teachers.*' => 'exists:users,id',
-            'videos' => 'nullable|file|mimes:mp4,mov,avi',
-            'files' => 'nullable|file',
+            //'videos' => 'nullable|file|mimes:mp4,mov,avi,',
+            //'files' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,gif,bmp,tiff,tif,txt,zip,rar,7z,',
+            //'files' => 'nullable|file|mimes:pdf,docx',
+            //'videos' => 'nullable|file|mimes:mp4,mov,avi',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    
         ];
     }
 }

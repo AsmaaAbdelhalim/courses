@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreExamRequest extends FormRequest
 {
@@ -26,12 +27,19 @@ class StoreExamRequest extends FormRequest
             'duration' => 'required|integer|min:1',
             'start_at' => 'nullable|date',
             'end_at' => 'nullable|date|after:start_at',
-            'total_grade' => 'required|integer|min:0',
-            'passing_grade' => 'required|integer|min:0|max:total_grade',
+            'total_grade' => 'required|integer',
+            'passing_grade' => 'required|integer|min:0',
             'user_id' => 'required|exists:users,id',
             'category_id' => 'nullable|exists:categories,id',
             'course_id' => 'required|exists:courses,id',
             'lesson_id' => 'nullable|exists:lessons,id',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+        'user_id' => Auth::id(),
+        ]);
     }
 }
