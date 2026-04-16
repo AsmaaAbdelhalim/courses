@@ -31,69 +31,65 @@ class Course extends Model
     'user_id',
     ];
 
+    protected $casts = [
+        'price' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'status' => 'boolean'
+    ];
 
-    //protected $casts = [
-    //    'price' => 'decimal:2',
-    //    'status' => 'boolean'
-    //];
     public function user(){
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class); 
     }
   
-        public function enrollment()
-        {
-            return $this->hasMany(Enrollment::class);
-        }
-        
-        public function isEnrolledByUser(User $user)
-        {
-            return $this->enrollment()->where('user_id', $user->id)->exists();
-        }
-        public function category(){
-            return $this->belongsTo(Category::class);
-        }
- 
-
-    public function lesson(){
-        return $this->hasMany(Lesson::class);
+    public function enrollment()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+    
+    public function isEnrolledByUser(User $user)
+    {
+        return $this->enrollment()->where('user_id', $user->id)->exists();
+    }
+    public function category(){
+        return $this->belongsTo(Category::class);
     }
 
     public function lessons(){
         return $this->hasMany(Lesson::class);
     }
     public function reviews()
-{
-    return $this->hasMany(Review::class);
-}
-public function wishlists()
-{
-    return $this->hasMany(Wishlist::class);
-}
+    {
+        return $this->hasMany(Review::class);
+    }
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
 
 
-public function users()
-{
-    return $this->belongsToMany(User::class, 'course_users')->withPivot('completed');
-}
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'course_users')->withPivot('completed');
+    }
 
-public function teachers()
-{
-    return $this->belongsToMany(User::class, 'courses','teachers', 'user_id','user_role'
+    public function teachers()
+    {
+        return $this->belongsToMany(User::class, 'courses','teachers', 'user_id','user_role'
 
-);
-}
+    );
+    }
 
-public function payments()
-{
-    return $this->hasMany(Payment::class);
-}
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 
-public function questions()
+    public function questions()
     {
         return $this->hasMany(Question::class);
     }
 
-public function exams()
+    public function exams()
     {
         return $this->hasMany(Exam::class);
     }

@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+    <link href="img/favicon.ico" rel="icon" alt="Favicon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -136,7 +136,7 @@
                                 @if(Auth::user()->avatar)
                                     <img src="{{ asset('storage/' . Auth::user()->avatar) }}" href="{{ route('profile')}}" alt="Avatar" style="border-radius: 50%; height: 40px; width: 40px;">
                                 @else
-                                    <img src="{{ asset('images/default-avatar.png') }}" href="{{ route('profile')}}" style="border-radius: 50%; height: 40px; width: 40px;">
+                                    <img src="{{ asset('images/default-avatar.png') }}" href="{{ route('profile')}}" alt="Avatar" style="border-radius: 50%; height: 40px; width: 40px;">
                                 @endif
                                 {{ Auth::user()->first_name }}
                             </a>

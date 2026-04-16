@@ -80,7 +80,9 @@
             <h5 class="m-0">{{ $enrollment->course->name }}</h5>
         </div>
         <div class="card-body">
-            <h6 class="card-title">{{ $enrollment->course->name }}</h6>
+            <h6 class="card-title">{{ $enrollment->course->name }}
+              {{ $enrollment->course->id }}
+            </h6>
             <img class="img-circle img-bordered-sm" src="../../dist/img/user7-128x128.jpg" alt="User Image">
             <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
             <a href="{{ route('course.show', [$enrollment->course->id]) }}" class="btn btn-primary">Go To Course</a>

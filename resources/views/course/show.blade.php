@@ -113,7 +113,7 @@
                         <h6 class="text-primary mb-3"><i class="far fa-clock"></i> {{ $course->created_at->format('Y-m')}}</h6>
                         <h1 class="mb-5">{{$course->name}} Course</h1>
                         <video class="img-fluid rounded w-100 mb-4" controls autoplay>
-                        <source src="{{ asset('videos/' . $course->videos) }}" type="video/mp4">
+                        <source src="{{ Storage::url( $path .'/'. $course->videos) }}" type="video/mp4">
                         </video>
 
                         <p> <h4>
@@ -154,7 +154,7 @@
                         <h2 class="mb-4">Description</h2>
                         <h4><i class="fas fa-book"></i> 
                         <h6>{{ $course->description }}</h6>
-                        <img class="img-fluid rounded w-100 mb-4" src="{{ asset('images/' . $course->image) }}" alt="Image">
+                        <img class="img-fluid rounded w-100 mb-4" src="{{ asset('storage/'.$path . '/' . $course->image) }}" alt="Image">
                         <a href="{{ asset('files/' . $course->files) }}"> {{ $course->name }} pdf</a>
                                
 
@@ -267,7 +267,7 @@
                            
                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                <a href="{{route ('category.show',[$category->id])}}" class="text-decoration-none h6 m-0">{{$category->name}}</a>
-                               <span class="badge badge-primary badge-pill">{{ $category->course->count() }}</span>
+                               <span class="badge badge-primary badge-pill">{{ $category->courses->count() }}</span>
                            </li>  @endforeach
                         </ul>
                     </div>
@@ -323,7 +323,7 @@
     @foreach($course->category->courses as $course)
                 <div class="col-lg-3 col-md-6 mb-4">
                     <div class="cat-item position-relative overflow-hidden rounded mb-2">
-                        <img class="img-fluid" style="height: 200px;" src="{{ asset('images/' . $course->image) }}" alt="course Image">
+                        <img class="img-fluid" style="height: 200px;" src="{{ asset('storage/'.$path . '/' . $course->image) }}" alt="course Image">
                         <a class="cat-overlay text-white text-decoration-none" href="{{route ('course.show',[$course->id])}}">
                             <h4 class="text-white font-weight-medium">{{ $course->name }}</h4>
                             <span>{{ $course->lessons->count() }} lesson</span>

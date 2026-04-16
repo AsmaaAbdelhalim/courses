@@ -10,7 +10,7 @@ use App\Models\Lesson;
 use App\Models\Course;
 use App\Models\User;
 use App\Models\Enrollment;
-use App\Models\Course_user;
+use App\Models\CourseUser;
 use App\Services\LessonService;
 
 class LessonController extends Controller
@@ -26,8 +26,9 @@ class LessonController extends Controller
      */
     public function index()
     {
-        $lessons = Lesson::all();
-        return view('lesson.index', compact('lessons'));
+        $lessons = Lesson::with('course')->latest()->paginate(10);
+        $path = $this->lessonService->getMediaPath('image');
+        return view('lesson.index', compact('lessons', 'path'));
     }
     /**
      * Display the specified resource.
@@ -35,79 +36,31 @@ class LessonController extends Controller
     public function show($course_id, $lesson_id)
     {
         $user = Auth::user();
-        $course = Course::findOrFail($course_id);
-        $lesson = Lesson::findOrFail($lesson_id);
+        $course = Course::with('lessons')->findOrFail($course_id);
+        $lesson = $course->lessons()->findOrFail($lesson_id);
 
-        if (!Enrollment::where('user_id', $user->id)->where('course_id', $course_id)->exists()) {
+        if (!$user->enrollments()->where('course_id', $course_id)->exists()) {
             return redirect()->route('course.show', $course_id)
-                ->with('error', 'You need to enroll in this course to view its lessons.');
+                ->with('error', 'You must enroll in this course first.');
         }
 
-        // Check if the user is enrolled in the course using the enrollment table
-        $isEnrolled = Enrollment::where('user_id', $user->id)
-                ->where('course_id', $course_id)
-                ->exists();
+        $user->lessons()->syncWithoutDetaching([
+            $lesson->id => [
+                'completed' => true,
+                'course_id' => $lesson->course_id 
+            ]
+        ]);
 
-        if (!$isEnrolled) {
-            return redirect()->route('course.show', $course_id)
-            ->with('error', 'You need to enroll in this course to view its lessons.');
-            }
+        $progress = $user->courseProgress($course_id);
+        $previousLesson = $lesson->previous();
+        $nextLesson = $lesson->next();
 
-        // Check if the lesson belongs to the course
-        if ($lesson->course_id != $course_id) {
-            return redirect()->route('course.show', $course_id)
-                ->with('error', 'This lesson does not belong to the specified course.');
-        }
+        $path =[
+            'image' => $this->lessonService->getMediaPath('image'),
+            'videos' => $this->lessonService->getMediaPath('videos'),
+        ];
 
-
-        // Update or insert the course_user record
-        Course_user::updateOrInsert(
-            ['user_id' => $user->id, 'course_id' => $course_id, 'lesson_id' => $lesson->id]
-        );
-
-        // Mark the lesson as completed
-        /** @var User $user */
-        $user->lessons()->updateExistingPivot($lesson_id, ['completed' => 1]);
-
-        // Calculate progress
-        $totalLessons = $course->lessons->count();
-        $completedLessons = $user->lessons->where('course_id', $lesson->course_id)->count();
-        $progress = number_format(($completedLessons / $totalLessons) * 100);
-
-        // Get previous and next lessons
-        $previousLesson = Lesson::where('course_id', $course_id)
-            ->where('id', '<', $lesson->id)
-            ->orderBy('id', 'desc')
-            ->first();
-
-        $nextLesson = Lesson::where('course_id', $course_id)
-            ->where('id', '>', $lesson->id)
-            ->orderBy('id')
-            ->first();
-
-        // Get only the lessons for the current course
-        $lessons = $course->lessons;
-
-        // Get the user's progress for the current course
-        //$userProgress = $user->lessons()->where('course_id', $course_id)->first();
-
-        // Calculate the progress percentage
-        //$progressPercentage = $userProgress ? ($userProgress->pivot->completed / $totalLessons) * 100 : 0;
-        // Check if the user has completed 100% of the lessons
-        //$canStartExam = $progress == 100;
-
-
-        return view('lesson.show', compact('course', 'lessons', 'lesson', 'user', 'previousLesson', 'nextLesson', 'progress'));
-    }
-
-    /**
-     *  
-     *
-     */
-    public function list()
-    {
-        $lessons = Lesson::all();
-        return view('lesson.list', compact('lessons'));
+        return view('lesson.show', compact('course', 'lesson', 'user', 'previousLesson', 'nextLesson', 'progress', 'path'));
     }
 
     /**
@@ -115,9 +68,8 @@ class LessonController extends Controller
      */
     public function create()
     {
-        $courses = Course::all();
+        $courses = Course::orderBy('name')->get();
         return view('lesson.create', compact('courses'));
-
     }
 
     /**
@@ -125,16 +77,12 @@ class LessonController extends Controller
      */
     public function store(StoreLessonRequest $request)
     {
-        
         try {
-            $lesson = $this->lessonService->create($request->validated(), $request);
-            return redirect()->route('lesson.index', $lesson);
+            $this->lessonService->create($request->validated(), $request);
+            return redirect()->route('lesson.index')->with('success', 'Lesson created!');
         } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->with('error', 'Failed to create lesson');
+            return back()->withInput()->with('error', 'Failed to create lesson');
         }
-        return redirect()->route('lesson.index')->with('success', 'Lesson created successfully!');
     }
 
     /**
@@ -142,7 +90,7 @@ class LessonController extends Controller
      */
     public function edit(Lesson $lesson)
     {
-        $courses = Course::all();
+        $courses = Course::orderBy('name')->get();
         return view('lesson.edit', compact(['lesson','courses']));
     }
 
@@ -161,7 +109,7 @@ class LessonController extends Controller
         }
         
 
-        return redirect()->route('lesson.index', $lesson->id)->with('success', 'Lesson updated successfully!');
+        return redirect()->route('lesson.index')->with('success', 'Lesson updated successfully!');
     }
 
     /**

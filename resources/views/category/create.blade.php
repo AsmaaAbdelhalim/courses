@@ -10,6 +10,15 @@
         }
     </style>
 @show
+
+
+  
+            @session('success')
+                <div class="alert alert-success" role="alert"> 
+                    {{ $value }}
+                </div>
+                <img src="images/{{ Session::get('image') }}" width="40%">
+            @endsession
 <div class="animated fadeIn">
     <div class="row">
         <div class="col-lg-10 m-auto py-2">
@@ -38,6 +47,8 @@
         <div class="form-group has-success">
          <label for="status" class="control-label mb-6">Category Image</label>
          <input type="file" name="image" id="image" class="form-control" accept="image/*">
+         // image selected
+         
           </div>
           <br>
       <button id="payment-button" type="mit" class="btn btn-lg btn-success btn-block">

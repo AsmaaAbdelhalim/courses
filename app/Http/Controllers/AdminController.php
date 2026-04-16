@@ -3,13 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Category;
-use App\Models\Course;
-use App\Models\Enrollment;
-use App\Models\User;
-use App\Models\Contact;
-use App\Models\Payment;
-use App\Models\Review;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -27,15 +21,17 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        $categories = Category::count();
-        $courses = Course::count();
-        $enrollments = Enrollment::count();
-        $users = User::count();
-        $contacts = Contact::count();
-        $payments = Payment::count();
-        $total_payments = Payment::sum('total_price');
-        $reviews = Review::count();
-        return view('admin', compact('categories', 'courses', 'enrollments', 'users', 'contacts', 'payments', 'total_payments', 'reviews'));
+        $stats = DB::table('categories')->selectRaw('
+            (SELECT COUNT(*) FROM categories) as categories,
+            (SELECT COUNT(*) FROM courses) as courses,
+            (SELECT COUNT(*) FROM enrollments) as enrollments,
+            (SELECT COUNT(*) FROM users) as users,
+            (SELECT COUNT(*) FROM contacts) as contacts,
+            (SELECT COUNT(*) FROM payments) as payments,
+            (SELECT SUM(total_price) FROM payments) as total_payments,
+            (SELECT COUNT(*) FROM reviews) as reviews
+        ')->first();
+        return view('admin', compact('stats'));
     }
 
     /**

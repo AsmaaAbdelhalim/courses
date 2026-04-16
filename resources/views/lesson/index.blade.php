@@ -1,106 +1,59 @@
-
-
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
 
+<br><br>
+    
+    <h1 class="m-0 text-white display-4 text-center"><span class="text-danger">lessons</span></h1>
 
-<!-- <div class="sidebar">
-    <ul class="nav nav-tabs" id="sidebarTabs" role="tablist">
-        @foreach ($lessons as $lesson)
-            <li class="nav-item">
-                <a class="nav-link" id="tab{{ $lesson->id }}" data-toggle="tab" href="#content{{ $lesson->id }}" role="tab" aria-controls="content{{ $lesson->id }}" aria-selected="false">{{ $lesson->title }}</a>
-            </li>
-        @endforeach
-    </ul>
-</div>
-
-<div class="content">
-    <div class="tab-content" id="sidebarTabContent">
-        @foreach ($lessons as $lesson)
-            <div class="tab-pane fade" id="content{{ $lesson->id }}" role="tabpanel" aria-labelledby="tab{{ $lesson->id }}">
-                <h3>{{ $lesson->title }}</h3>
-                <p>{{ $lesson->description }}</p>
-            </div>
-        @endforeach
-    </div>
-</div> -->
-
-
-<!-- <div class="sidebar">
-    @foreach ($lessons as $lesson)
-        <div class="sidebar-tab" data-content="#content{{ $lesson->id }}">{{ $lesson->title }}</div>
-    @endforeach
-</div>
-
-<div class="content">
-    @foreach ($lessons as $lesson)
-        <div class="tab-content" id="content{{ $lesson->id }}">
-            <h3>{{ $lesson->title }}</h3>
-            <p>{{ $lesson->description }}</p>
-        </div>
-    @endforeach
-</div> -->
-
-<style>
-
-.container {
-    display: flex;
-}
-
-.sidebar {
-    width: 200px;
-    background-color: #f5f5f5;
-    padding: 10px;
-}
-
-.sidebar-tab {
-    margin-bottom: 10px;
-    padding: 5px;
-    background-color: #ddd;
-    cursor: pointer;
-}
-
-.content {
-    flex: 1;
-    padding: 10px;
-}
-
-</style>
+    <a href="{{route('lesson.create')}}" class="btn btn-primary btn-lg m-2">Add Lesson</a>
 
 <div class="container">
-    <div class="sidebar">
-        @foreach ($lessons as $lesson)
-            <div class="sidebar-tab" data-content="#content{{ $lesson->id }}">{{ $lesson->title }}</div>
-            <h3 style="color: {{ $lesson->completed ? 'green' : 'black' }}">
-        {{ $lesson->title }}
-    </h3>
-    @if ($lesson->completed && $loop->index + 1 < count($lessons))
-        <a href="{{ route('lessons.show', $lessons[$loop->index + 1]->id) }}">Go to next lesson</a>
-    @endif
+    <div class="row">
+    <div class="col-lg-10 m-auto py-2">
+    <table class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Lesson Title</th>
+            <th>Course</th>
+            <th>Image</th>
+            <th>Files</th>
+            <th>Videos</th>
+            <th>Created By</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($lessons as $lesson)
+        <tr>
+            <td>{{ $lesson->id }}</td>
+            <td>{{ $lesson->title }}</td>
+            <td>{{ $lesson->course->name }}</td>
+            <td><img src="{{ asset('storage/'.$path . '/' . $lesson->image) }}" width="50" height="50"></td>
+            <td>{{ $lesson->files }}</td>
+            <td>{{ $lesson->videos }}</td>
+            <td>{{$lesson->user->first_name}}</td>
+            <td>
+                <!-- Action buttons --> 
+                <a
+            href=""
+             class="btn btn-info ">
+              Details
+            </a>
+                <a href="{{route ('lesson.edit',[$lesson->id])}}" class="btn btn-primary">Edit</a>
+                <form action="{{route('lesson.destroy',[$lesson->id])}}" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
         @endforeach
+    </tbody>
+</table>
+
+       
     </div>
-
-    <div class="content">
-        @foreach ($lessons as $lesson)
-            <div class="tab-content" id="content{{ $lesson->id }}">
-                <h3>{{ $lesson->title }}</h3>
-                <p>{{ $lesson->description }}</p>
-            </div>
-        @endforeach
     </div>
-</div>
-
-
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $(".sidebar-tab").click(function() {
-            var contentId = $(this).data("content");
-            $(".tab-content").hide();
-            $(contentId).show();
-        });
-    });
-</script>
-
     @endsection

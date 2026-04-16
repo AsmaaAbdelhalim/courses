@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreLessonRequest extends FormRequest
 {
@@ -26,9 +27,8 @@ class StoreLessonRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'duration' => 'nullable|integer|min:1',
-            'content' => 'nullable|longText',
+            'content' => 'nullable|string',
             'links' => 'nullable|string',
-            'audios' => 'nullable|string',
             'session' => 'nullable|string',
             'summary' => 'nullable|string',
             'position' => 'nullable|integer',
@@ -43,4 +43,12 @@ class StoreLessonRequest extends FormRequest
             'audios' => 'nullable|file',
         ];
     }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+        'user_id' => Auth::id(),
+        ]);
+    }
+
 }

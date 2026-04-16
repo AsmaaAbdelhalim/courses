@@ -16,7 +16,7 @@
             <th>City</th>
             <th>Subject</th>
             <th>Message</th>
-            <th>Actions</th>
+            <th>Send At</th>
         </tr>
     </thead>
     <tbody>
@@ -30,10 +30,7 @@
             <td>{{ $contact->city}}</td>
             <td>{{ $contact->subject }}</td>
             <td>{{ $contact-> message}}</td>
-            <td>
-                <!-- Action buttons --> 
-
-            </td>
+            <td>{{ $contact->created_at->format('d-m-Y H:i:s') }}</td>
         </tr>
         @endforeach
     </tbody>

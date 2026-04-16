@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Category extends Model
 {
@@ -23,11 +25,6 @@ class Category extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function course()
-    {
-        return $this->hasMany(Course::class);
     }
 
     public function wishlists()

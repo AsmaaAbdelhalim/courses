@@ -15,46 +15,32 @@ class Lesson extends Model
         'course_id',
         'user_id',
         'videos',
-        'created_at',
-        'updated_at',
-
         'completed'
     ];
-    
-    
+
     public function course()
     {
         return $this->belongsTo(Course::class);
     }
 
-    public function User()
+    public function next()
+    {
+        return self::where('course_id', $this->course_id)
+            ->where('id', '>', $this->id)
+            ->orderBy('id', 'asc')
+            ->first();
+    }
+
+    public function previous()
+    {
+        return self::where('course_id', $this->course_id)
+            ->where('id', '<', $this->id)
+            ->orderBy('id', 'desc')
+            ->first();
+    }
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-
-    public function lessons_completed()
-    {
-        return $this->hasMany(lesson::class, 'user_id');
-    }
-
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'course_user')
-        ->withPivot('lessons_completed')
-        ->withTimestamps();
-    }
-    public function courses(){
-        return $this->belongsToMany(Course::class, 'course_users')
-        ->withPivot('completed')
-        ->withTimestamps();
-    }
-
-    }
-           
-// public function lesson_files()
-    // {
-    //     return $this->hasMany(LessonFile::class);
-    // }
-
-
+}

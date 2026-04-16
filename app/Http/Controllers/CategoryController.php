@@ -25,7 +25,8 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::withCount('courses')->latest()->paginate(10);
-        return view('category.index', compact('categories'));
+        $path = $this->categoryService->getMediaPath('image');
+        return view('category.index', compact('categories', 'path'));
     }
 
 
@@ -68,18 +69,22 @@ class CategoryController extends Controller
     {
         $courses = $category->courses()->paginate(12);
         $creator = $category->user;
+        $path = [
+            'course' => app(\App\Services\CourseService::class)->getMediaPath('image'),
+            'category' => $this->categoryService->getMediaPath('image'),
+        ];
 
         /** @var User $user */
         $user = Auth::user();
         $user_wishlist_ids = $user ? $user->wishlists()->pluck('course_id')->toArray() : [];
 
-        return view('category.show', compact('category', 'creator', 'courses', 'user_wishlist_ids'));
+        return view('category.show', compact('category', 'creator', 'courses', 'user_wishlist_ids', 'path'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Category $category)
+    public function edit(Category $category) 
     {
         return view('category.edit', compact('category'));
     }

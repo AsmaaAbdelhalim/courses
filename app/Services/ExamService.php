@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Exceptions\FileUploadException;
 
 class CourseService
 {
@@ -46,7 +45,7 @@ class CourseService
     {
         $this->handleImage($request, $course);
         $this->handleVideo($request, $course);
-        $this->handlefiles($request, $course);
+        $this->handleFiles($request, $course);
     }
 
     private function handleImage(Request $request, Course $course): void

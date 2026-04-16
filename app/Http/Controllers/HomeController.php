@@ -25,12 +25,17 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $categories = Category::latest()->take(12)->get();
+        $categories = Category::withCount('courses')->latest()->take(12)->get();
         $courses = Course::latest()->take(12)->get();
         $recentFreeCourses = Course::where('price', 0)->latest()->take(8)->get();
 
+        $path = [
+            'category' => app(\App\Services\CategoryService::class)->getMediaPath('image'),
+            'course' => app(\App\Services\CourseService::class)->getMediaPath('image'),
+        ];
+ 
         /** @var User $user */
         $user_wishlist_ids = Auth::check() ? Auth::user()->wishlists()->pluck('course_id')->all() : [];
-        return view('home', compact('categories', 'courses', 'recentFreeCourses', 'user_wishlist_ids' ));       
+        return view('home', compact('categories', 'courses', 'recentFreeCourses', 'user_wishlist_ids', 'path'));       
     } 
 }

@@ -27,7 +27,8 @@
             {{ $payment->user->last_name }}</td> 
             <td>{{ $payment->course_id }}</td>
             <td>{{ $payment->course->name }}</td>
-            <td>{{ $payment->total_price }}</td>
+            <td>{{ $payment->total_price }} $ {{$payment->currency}}</i>
+        </td>
             <td>{{ date("F d, Y", strtotime($payment->created_at))}}</td>
         </tr>
         @endforeach

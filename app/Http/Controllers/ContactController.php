@@ -31,13 +31,16 @@ class ContactController extends Controller
      */
     public function store(StoreContactRequest $request)
     {
+        try {
         Contact::create($request->validated());
+            return redirect()->route('contact.index')
+            ->with('success', 'Thank you for contacting us. We will contact you shortly.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to create contact');
+        }
 
-        return redirect()->route('contact.index')
-        ->with('success', 'Thank you for contacting us. We will contact you shortly.');
-
-        //return view('contact.index')->with('success', 'Thank you for contacting us. We will contact you shortly.');
-        //return redirect()->back()->with(['success' => 'Thank you for contact us. we will contact you shortly.']);
     }
 
     /**

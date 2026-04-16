@@ -274,7 +274,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{route('lesson.list')}}" class="nav-link">
+                <a href="{{route('lesson.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Lessons</p>
                 </a>
@@ -282,6 +282,52 @@
 
 </ul>
           </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-file-alt"></i>
+              <p>
+                Exams
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+            <li class="nav-item">
+                <a href="{{route('exam.create')}}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Add Exam</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('exam.index')}}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>List exams</p>
+                </a>
+              </li>
+
+</ul>
+          </li>
+
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-list"></i>
+              <p>
+                Results
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{route('result.index')}}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>List Results</p>
+                </a>
+              </li>
+
+</ul>
+          </li>
+
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-star"></i>
@@ -292,7 +338,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('review.list')}}" class="nav-link">
+                <a href="{{route('review.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Reviews</p>
                 </a>
@@ -300,7 +346,7 @@
 
 </ul>
           </li>
-          </li>
+       
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-users"></i>
@@ -349,7 +395,7 @@
  
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{route('payment.list')}}" class="nav-link">
+                <a href="{{route('payment.index')}}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>List Payments</p>
                 </a>
@@ -357,7 +403,16 @@
 
 </ul>
           </li>
-  
+ 
+  <li class="nav-item">
+    <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault();
+    document.getElementById('logout-form').submit();">  <i class="nav-icon fas fa-sign-out-alt"></i> {{ __('Logout') }}</a>
+    
+      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+          @csrf
+      </form>
+</li>
+        
       </nav>
       <!-- /.sidebar-menu -->
     </div>
@@ -434,5 +489,7 @@
 <script src="{{('../../../dist/js/demo.js')}}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{{('../../../dist/js/pages/dashboard2.js')}}"></script>
+
+@yield('scripts')
 </body>
 </html>

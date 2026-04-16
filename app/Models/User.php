@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Lesson;
+use App\Models\CourseUser;
 
 class User extends Authenticatable
 {
@@ -45,26 +47,14 @@ class User extends Authenticatable
     ];
 
 
-
-    
     public function course()
     {
         return $this->hasMany(Course::class);
     }
 
-    public function enrollments()
-    {
-        return $this->hasMany(Enrollment::class);
-    }
-
     public function reviews()
     {
         return $this->hasMany(Review::class);
-    }
-
-    public function user()
-    {
-        return $this->hasMany(User::class);
     }
     
     public function wishlists()
@@ -72,22 +62,36 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class);
     }
 
-  
-    public function courses()
+    public function enrollments()
     {
-        return $this->belongsToMany(Course::class, 'course_users')->withPivot('completed');
+        return $this->hasMany(Enrollment::class);
     }
 
     public function lessons()
     {
-        return $this->belongsToMany(Lesson::class, 'course_users')->withPivot('lessons_completed')
-        ->withTimestamps();
+        return $this->belongsToMany(Lesson::class, 'course_users')
+            ->withPivot('completed', 'course_id')
+            ->withTimestamps();
     }
 
     public function courseUsers()
-{
-    return $this->hasMany(Course_user::class);
-}
+    {
+        return $this->hasMany(CourseUser::class);
+    }
 
+    public function courseProgress(int $courseId): int
+    {
+        $course = Course::withCount('lessons')->find($courseId);
 
+        if (!$course || $course->lessons_count === 0) {
+            return 0;
+        }
+
+        $completedCount = $this->lessons()
+            ->where('lessons.course_id', $courseId)
+            ->wherePivot('completed', 1)
+            ->count();
+
+        return round(($completedCount / $course->lessons_count) * 100);
+    }
 }

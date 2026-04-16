@@ -9956,3 +9956,12 @@ h6,
   padding: 0;
   list-style-type: none;
 }
+
+.toggle-password{
+  position:absolute;
+  right:15px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  margin-right:10px;
+}

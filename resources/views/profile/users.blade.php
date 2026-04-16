@@ -51,7 +51,7 @@
         
             <td>
                 <!-- Action buttons --> 
-               <a href="">Edit</a>
+               <a href="{{ route('profile.edit-user-role', $user) }}">Edit</a>
             </td>
         </tr>
         @endforeach

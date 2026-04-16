@@ -28,7 +28,7 @@ class StoreExamRequest extends FormRequest
             'start_at' => 'nullable|date',
             'end_at' => 'nullable|date|after:start_at',
             'total_grade' => 'required|integer',
-            'passing_grade' => 'required|integer|min:0',
+            'passing_grade' => 'required|integer|min:0|lte:total_grade',
             'user_id' => 'required|exists:users,id',
             'category_id' => 'nullable|exists:categories,id',
             'course_id' => 'required|exists:courses,id',

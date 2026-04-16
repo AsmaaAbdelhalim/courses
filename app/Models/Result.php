@@ -14,6 +14,10 @@ class Result extends Model
         'score',
         'correct_answers',
         'passed',
+        'attempts',
+        'certificate',
+        'code',
+        
     ];
 
     public function user()

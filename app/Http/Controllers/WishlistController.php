@@ -7,10 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\Wishlist;
 use App\Models\Course;
 use App\Models\User;
+use App\Services\CourseService;
 use Illuminate\Support\Facades\Auth;
 
 class WishlistController extends Controller
 {
+    private CourseService $courseService;
+    public function __construct(CourseService $courseService)
+    {
+        $this->courseService = $courseService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -24,7 +30,10 @@ class WishlistController extends Controller
         $user = Auth::user();
         $user_wishlist_ids = $user->wishlists()->pluck('course_id')->all();
         $wishlistCourses = Course::whereIn('id', $user_wishlist_ids)->get();
-        return view('wishlist.index', compact('wishlistCourses','user', 'user_wishlist_ids'));
+        $path = [
+            'course' => $this->courseService->getMediaPath('image'),
+        ];
+        return view('wishlist.index', compact('wishlistCourses','user', 'user_wishlist_ids', 'path'));
 
     }
  

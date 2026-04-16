@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+
 
 class StoreQuestionRequest extends FormRequest
 {
@@ -23,22 +25,34 @@ class StoreQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'exam_id' => 'sometimes|exists:exams,id',
+            'user_id' => 'required|exists:users,id',
+            'exam_id' => 'required|exists:exams,id',
             'course_id' => 'sometimes|exists:courses,id',
             'question' => 'required|string|max:255',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'video' => 'sometimes|mimes:mp4,webm,ogg|max:2048',
+            'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'video' => 'nullable|file|mimes:mp4,webm,ogg|max:4096',
             
             'answers' => 'required|array|min:1',
             'answers.*.answer' => 'required|string|max:255',
-            'answers.*.correct' => 'sometimes|boolean',
+            'answers.*.correct' => 'nullable',
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $this->merge([
-        'user_id' => Auth::id(),
+            'user_id' => Auth::id(),
         ]);
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $correct = collect($this->answers)->where('correct', true);
+
+            if ($correct->count() == 0) {
+                $validator->errors()->add('answers', 'At least one correct answer required');
+            }
+        });
     }
 }

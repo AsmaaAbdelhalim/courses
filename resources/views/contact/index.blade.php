@@ -34,21 +34,21 @@
                                  @endif
                             </div>
                             <div class="control-group">
-                                <input type="phone" class="form-control border-0 p-4" name="phone" id="phone" placeholder="Your phone" required="required" data-validation-required-message="Please enter your phone" />
+                                <input type="text" class="form-control border-0 p-4" name="phone" id="phone" placeholder="Your phone" required="required" data-validation-required-message="Please enter your phone" />
                                 <p class="help-block text-danger"></p>
                                 @if ($errors->has('phone'))
                                             <span class="text-danger">{{ $errors->first('phone') }}</span>
                                  @endif
                             </div>
                             <div class="control-group">
-                                <input type="country" class="form-control border-0 p-4" name="country" id="country" placeholder="Your country" required="required" data-validation-required-message="Please enter your country" />
+                                <input type="text" class="form-control border-0 p-4" name="country" id="country" placeholder="Your country" required="required" data-validation-required-message="Please enter your country" />
                                 <p class="help-block text-danger"></p>
                                 @if ($errors->has('country'))
                                             <span class="text-danger">{{ $errors->first('country') }}</span>
                                  @endif
                             </div>
                             <div class="control-group">
-                                <input type="city" class="form-control border-0 p-4" name="city" id="city" placeholder="Your city" required="required" data-validation-required-message="Please enter your city" />
+                                <input type="text" class="form-control border-0 p-4" name="city" id="city" placeholder="Your city" required="required" data-validation-required-message="Please enter your city" />
                                 <p class="help-block text-danger"></p>
                                 @if ($errors->has('city'))
                                             <span class="text-danger">{{ $errors->first('city') }}</span>

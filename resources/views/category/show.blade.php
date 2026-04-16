@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @section('content')
     <!-- Header Start -->
+    <img src="{{  asset('storage/'. $path['category'] .'/'.$category->image) }}" position="relative"; width="100%"; height= "350px"; padding-bottom="56.25%"; >
 
-            <img src="{{ asset('images/' . $category->image) }}" position="relative"; width="100%"; height= "350px"; padding-bottom="56.25%"; >
     <!-- Category Start -->
     
  <!-- End -->

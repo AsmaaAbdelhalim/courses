@@ -2,76 +2,89 @@
 
 namespace App\Services;
 
+use App\Services\FileService;
 use App\Models\Course;
 use Illuminate\Http\Request;
 
 class CourseService
 {
-    private const IMAGE_PATH = 'courses/images';
-    private const VIDEO_PATH = 'courses/videos';
-    private const FILE_PATH = 'courses/files';
     
-    private const ALLOWED_IMAGES = ['jpg', 'jpeg', 'png'];
-    private const ALLOWED_VIDEOS = ['mp4', 'mov'];
-    private const ALLOWED_FILES = ['pdf', 'doc', 'docx'];
-    
-    private const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-    private const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
-    private const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    private const MEDIA_CONFIG = [
+        'image' => [
+            'path' => 'courses/images',
+            'types' => ['jpg', 'jpeg', 'png'],
+            'max_size' => 5242880 // 5MB
+        ],
+        'videos' => [
+            'path' => 'courses/videos',
+            'types' => ['mp4', 'mov'],
+            'max_size' => 104857600 // 100MB
+        ],
+        'files' => [
+            'path' => 'courses/files',
+            'types' => ['pdf', 'doc', 'docx'],
+            'max_size' => 10485760 // 10MB
+        ]
+    ];
 
     public function __construct(
-        private FileService $fileService
+        private readonly FileService $fileService
     ) {}
 
     public function create(array $data, Request $request): Course
     {
         $course = Course::create($data);
-        $this->handleFiles($request, $course);
+        $this->handleMedia($request, $course);
         return $course;
     }
 
     public function update(Course $course, array $data, Request $request): Course
     {
+        //delete old image or file or video when updating
+        if($course->image){
+            $this->fileService->deleteFile(self::MEDIA_CONFIG['image']['path']. '/' . $course->image);
+        }
         $course->update($data);
-        $this->handleFiles($request, $course);
+        $this->handleMedia($request, $course);
+
         return $course;
     }
 
-    private function handleFiles(Request $request, Course $course): void
+    
+
+    private function handleMedia(Request $request, Course $course): void
     {
-        // Handle Image
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            if ($this->fileService->validateFile($file, self::ALLOWED_IMAGES, self::MAX_IMAGE_SIZE)) {
-                if ($course->image) {
-                    $this->fileService->deleteFile(self::IMAGE_PATH . '/' . $course->image);
-                }
-                $course->image = $this->fileService->uploadFile($file, self::IMAGE_PATH);
+        foreach (self::MEDIA_CONFIG as $field => $config) {
+            if ($request->hasFile($field)) {
+                $this->processFile($request->file($field), $course, $field, $config);
             }
         }
-
-        // Handle Video
-        if ($request->hasFile('video')) {
-            $file = $request->file('video');
-            if ($this->fileService->validateFile($file, self::ALLOWED_VIDEOS, self::MAX_VIDEO_SIZE)) {
-                if ($course->video) {
-                    $this->fileService->deleteFile(self::VIDEO_PATH . '/' . $course->video);
-                }
-                $course->video = $this->fileService->uploadFile($file, self::VIDEO_PATH);
-            }
-        }
-
-        // Handle File
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            if ($this->fileService->validateFile($file, self::ALLOWED_FILES, self::MAX_FILE_SIZE)) {
-                if ($course->file) {
-                    $this->fileService->deleteFile(self::FILE_PATH . '/' . $course->file);
-                }
-                $course->file = $this->fileService->uploadFile($file, self::FILE_PATH);
-            }
-        }
-
-        $course->save();
     }
+
+   // public function delete(Course $course): void
+    //{
+      //  DB::transaction(function () use ($course) {
+      //      if ($course->image) {
+//$this->fileService->deleteFile(self::MEDIA_CONFIG['image']['path']. '/' . $course->image);
+          //  }
+          //  $course->delete();
+       // });
+   // }
+
+
+   private function processFile($file, Course $course, string $field, array $config): void
+   {
+       if (!$this->fileService->validateFile($file, $config['types'], $config['max_size'])) {
+           return;
+       }
+       
+       // Store full path in database
+       $course->$field = $this->fileService->uploadFile($file, $config['path']);
+       $course->save();
+   }
+
+   public function getMediaPath(string $type): ?string
+   {
+       return self::MEDIA_CONFIG[$type]['path'] ?? null;
+   }
 }

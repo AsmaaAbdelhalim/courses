@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\FileService;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -35,7 +36,7 @@ class CategoryService
         $category = Category::create($data);
         $this->handleMedia($request, $category);
         return $category;
-    }
+    } 
 
     public function update(Category $category, array $data, Request $request): Category
     {
@@ -60,22 +61,6 @@ class CategoryService
         }
     }
 
-    private function processFile($file, Category $category, string $field, array $config): void
-    {
-        if (!$this->fileService->validateFile($file, $config['types'], $config['max_size'])) {
-            return;
-        }
-
-        if ($category->{$field}) {
-            $this->fileService->deleteFile($config['path'] . '/' . $category->{$field});
-        }
-
-        $category->{$field} = $this->fileService->uploadFile($file, $config['path']);
-        $category->save();
-    }
-
-
-
    // public function delete(Category $category): void
     //{
       //  DB::transaction(function () use ($category) {
@@ -85,4 +70,21 @@ class CategoryService
           //  $category->delete();
        // });
    // }
+
+
+   private function processFile($file, Category $category, string $field, array $config): void
+   {
+       if (!$this->fileService->validateFile($file, $config['types'], $config['max_size'])) {
+           return;
+       }
+       
+       // Store full path in database
+       $category->$field = $this->fileService->uploadFile($file, $config['path']);
+       $category->save();
+   }
+
+   public function getMediaPath(string $type): ?string
+   {
+       return self::MEDIA_CONFIG[$type]['path'] ?? null;
+   }
 }

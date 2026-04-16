@@ -22,16 +22,17 @@ class UpdateExamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|required|string|max:255',
-            'duration' => 'sometimes|required|integer|min:1',
+            'title' => 'sometimes|string|max:255',
+            'duration' => 'sometimes|integer|min:1',
             'start_at' => 'nullable|date',
             'end_at' => 'nullable|date|after:start_at',
-            'total_grade' => 'sometimes|required|integer|min:0',
-            'passing_grade' => 'sometimes|required|integer|min:0|max:total_grade',
-            'user_id' => 'sometimes|required|exists:users,id',
-            'category_id' => 'nullable|required|exists:categories,id',
+            'total_grade' => 'sometimes|integer|min:0',
+            'passing_grade' => 'sometimes|integer|min:0|lte:total_grade',
+            'user_id' => 'sometimes|exists:users,id',
+            'category_id' => 'sometimes|exists:categories,id',
             'course_id' => 'sometimes|exists:courses,id',
             'lesson_id' => 'nullable|exists:lessons,id',
         ];
     }
+
 }

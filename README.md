@@ -1,7 +1,7 @@
 ## Courses platform
 
 ## Description
-This Laravel 10 project aims to provide an online platform for hosting and managing courses.
+This Laravel 11 project aims to provide an online platform for hosting and managing courses.
 
 ## Features and Explanations
 
@@ -169,16 +169,9 @@ This Laravel 10 project aims to provide an online platform for hosting and manag
 
 ---
 
-### 18. Notifications for Enrollment, Course Completion, and Payment Status
-**Description:**  Users and relevant staff are notified about enrollment, course completion, and payment results.
-
-**Explanation:**
-- Users and teachers are notified when a user enrolls in or completes a course.
-- Payment success or failure triggers notifications to users and admins/teachers.
-- Course completion notifications include a link to download the certificate.
 
 ## Technologies Used
-- Laravel 10
+- Laravel 11
 - PHP
 - MySQL
 - HTML/CSS
@@ -266,154 +259,6 @@ This Laravel 10 project aims to provide an online platform for hosting and manag
 - **Database errors:** Ensure you have run migrations and your database credentials are correct.
 - **File uploads not working:** Check permissions on the `public/uploads` directory.
 
-
-
-
-# 🎓 Online Learning Platform – Laravel-Based LMS
-
-A full-featured online learning management system (LMS) built with **Laravel 12**, offering powerful tools for students, teachers, and administrators to manage courses, content, and communication efficiently.
-
----
-
-## 🚀 Features
-
-### 1. User Registration and Authentication
-- Secure login and registration system using Laravel's built-in auth.
-- Password hashing and reset via email.
-- Role-based access: Admin, Teacher, Student.
-
-### 2. Course Listings and Catalog
-- Public catalog with course title, description, instructor, duration, and ratings.
-- Filter and search by category or keyword.
-- Dedicated course detail pages with reviews.
-
-### 3. Student Enrollment
-- Students can enroll in free or paid courses.
-- Enrolled courses appear in the user dashboard.
-- Enrollment status saved in the database.
-
-### 4. Admin Dashboard
-- Manage users, courses, categories, and site settings.
-- View platform statistics like revenue and total enrollments.
-
-### 5. Teacher Dashboard
-- Teachers manage their own courses and materials.
-- Track student progress and enrollments.
-
-### 6. File Uploads for Courses
-- Support for images (JPG, PNG, WebP), videos (MP4, MOV, WEBM), and documents (PDF, DOC/DOCX).
-- File validation and storage optimization.
-
-### 7. Contact Form with Email Notifications
-- Contact form stores messages in the database.
-- Email notifications sent to admin using Laravel Mailable.
-
-### 8. Reviews and Ratings
-- Only enrolled students can leave reviews and ratings.
-- Each course shows user feedback and average rating.
-
-### 9. Wishlist
-- Users can add courses to their wishlist for future enrollment.
-- Managed via user dashboard.
-
-### 10. Search and Filtering
-- Search courses by name and description.
-- Filter by category, rating, and more.
-
-### 11. Payment Integration (Optional)
-- Integrated with Stripe and PayPal for paid course enrollment.
-- Secure transactions with receipts and payment validation.
-
-### 12. Responsive Design
-- Fully mobile-friendly using Bootstrap.
-- Works smoothly on desktop, tablet, and mobile.
-
-### 13. Role-Based Access Control
-- Admin: Full access to manage the system.
-- Teacher: Manage own courses and view enrolled students.
-- Student: Enroll, learn, take exams, and earn certificates.
-
-### 14. Exam and Result Management
-- Teachers can create exams/quizzes.
-- Students take exams and view results.
-- Results stored for review.
-
-### 15. Certificate Generation
-- Auto-generated PDF certificate on successful course completion.
-- Uses `barryvdh/laravel-dompdf`.
-- Downloadable and email-compatible.
-
-### 16. Notifications for New Contact Messages
-- In-app and email notifications for admins on new messages.
-
-### 17. Notifications for Admin/Teacher CRUD Actions
-- Users notified of relevant updates (e.g., new or updated courses).
-
-### 18. Notifications for Enrollment, Completion, and Payment
-- Real-time alerts for enrollments, payments, and course completion.
-- Certificate download links included in completion notifications.
-
----
-
-## 🛠️ Technologies Used
-
-- **Laravel 12** – PHP Framework
-- **PHP** – Server-side scripting
-- **MySQL** – Database
-- **HTML5 / CSS3** – Frontend structure and styling
-- **JavaScript** – Interactivity
-- **Bootstrap** – Responsive design framework
-
----
-
-## 📦 Installation Instructions
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-repo/online-lms.git
-   cd online-lms
-Install dependencies:
-
-bash
-Copy
-Edit
-composer install
-npm install && npm run dev
-Configure environment:
-
-Copy .env.example to .env
-
-Set DB credentials and MAIL_ADMIN for notifications
-
-bash
-Copy
-Edit
-php artisan key:generate
-Run migrations and seed data (optional):
-
-bash
-Copy
-Edit
-php artisan migrate --seed
-Start development server:
-
-bash
-Copy
-Edit
-php artisan serve
-📧 Contact
-For support or feature requests, contact the admin via the built-in contact form or email us at admin@example.com.
-
-📄 License
-This project is open-source and available under the MIT License.
-
-yaml
-Copy
-Edit
-
----
-
-Let me know if you'd like a **version with screenshots**, deployment instructions (e.g., for Laravel Forge, Heroku), or a **GitHub-ready badge setup**!
 
 
 

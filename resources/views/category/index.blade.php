@@ -29,7 +29,12 @@
             <td>{{ $category->id }}</td>
             <td>{{ $category->name }}</td>
             <td>{{ $category->description }}</td>
-            <td><img src="{{ asset('images/' . $category->image) }}" alt="Category Image" width="100" height="100"></td>
+            <td><img src="{{ Storage::url( $path . '/' . $category->image) }}" alt="Category Image" width="100" height="100">
+
+            <img src="{{ asset('storage/'.$path . '/' . $category->image) }}">
+         
+
+        </td>
        
             <td>{{$category->user->first_name}}</td>
             <td>{{$category->course_count}}</td>

@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
-class StoreWishlistRequest extends FormRequest
+class SubmitExamRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,19 +22,16 @@ class StoreWishlistRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'course_id' => 'required|exists:courses,id',
-            'user_id' => 'required|exists:users,id'
+            'answers'   => ['required', 'array', 'min:1'],
+            'answers.*' => ['required', 'exists:answers,id'],
         ];
     }
 
-     /**
-     * Get the validated data with additional fields.
-     */
-    protected function prepareForValidation(): void
+    public function messages(): array
     {
-        $this->merge([
-        'user_id' => Auth::id(),
-        'course_id' => $this->route('course'),
-        ]);
+        return [
+            'answers.required' => 'Please answer the questions before submitting.',
+            'answers.*.exists' => 'One of the selected answers is invalid.',
+        ];
     }
 }

@@ -57,7 +57,7 @@
     
     <div class="form-group">
         <label for="files">Files</label>
-        <input type="file" name="files" id="files" class="form-control" multiple="multiple" accept=".doc,.docx,.pdf,.ppt,.pptx">
+        <input type="file" name="files" id="files" class="form-control" accept=".doc,.docx,.pdf,.ppt,.pptx">
     </div>
     <div class="form-group">
         <label for="videos">Videos</label>

@@ -18,7 +18,7 @@
                         <p>Thank you for your payment.</p>
                             If you have any questions, please conact us.
                         </p>
-                        <a href="" class="btn btn-success">Go To Course</a>
+                        <a href="{{ route('course.show', $course) }}" class="btn btn-success">Go To Course</a>
                     </div>   
                 </div>   
             </div>

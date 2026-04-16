@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreQuestionRequest;
+use App\Http\Requests\UpdateQuestionRequest;
 use App\Models\Course;
 use App\Models\Exam;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Answer;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class QuestionController extends Controller
 {
@@ -37,45 +38,25 @@ class QuestionController extends Controller
      */
     public function store(StoreQuestionRequest $request)
     {
-        Log::info($request->validated());
-        $question = Question::create([
-            'exam_id' => $request->validated('exam_id'),
-            'course_id' => $request->validated('course_id'),
-            'question' => $request->validated('question'),
-            'image' => $request->validated('image'),
-            'video' => $request->validated('video'),
-            'user_id' => Auth::id()
-        ]);
-        foreach ($request->answers as $answerData) {
-            Answer::create([
-                'exam_id' => $request->validated('exam_id'),
-                'course_id' => $request->validated('course_id'),
-                'question_id' => $question->id,
-                'answer' => $answerData['answer'],
-                'correct' => isset($answerData['correct']) ? 1 : 0,
-                'user_id' => Auth::id()
-            ]);
-        }
-        if($request->hasfile('image'))
-        {
-            $image = $request->file('image');
-            $filename = time().'.'.$image->getClientOriginalExtension();
-            $image->move(public_path('images'), $filename);
-            $question->image = $filename;
-            $question->save();
-            Storage::delete($question->video);
+        $validatedData = $request->validated();
+        return DB::transaction(function () use ($validatedData) {
+            $question = Question::create($validatedData);
+            foreach ($validatedData['answers'] as $answer) {
+                $question->answers()->create([
+                    'answer'  => $answer['answer'],
+                    'correct' => !empty($answer['correct']),
+                    'user_id' => auth()->id(),
+                ]);
             }
-            if($request->hasfile('video'))
-            {
-                $video = $request->file('video');
-                $filename = time().'.'.$video->getClientOriginalExtension();
-                $video->move(public_path('videos'), $filename);
-                $question->video = $filename;
-                $question->save();
-                Storage::delete($question->image);
-                } 
-
+            $question->load('answers');
+            $html = view('exam.partials.question', compact('question'))->render();
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        });
     }
+    
     /**
      * Display the specified resource.
      */
@@ -83,31 +64,52 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($id);
         $courses = Course::pluck('title', 'id')->prepend('Please select', '');
-        
         return view('question.show', compact('question','courses'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Question $question)
     {
-        
+      //$question = Question::with('answers')->findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'question' => $question->load('answers')
+        ]);
     }
+    
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateQuestionRequest $request, Question $question)
     {
-        //
+        $validated = $request->validated();
+        return DB::transaction(function () use ($validated, $question) {
+            $question->update($validated);
+            $question->answers()->delete();
+            foreach ($validated['answers'] as $ans) {
+                $question->answers()->create([
+                    'answer'  => $ans['answer'],
+                    'correct' => !empty($ans['correct']),
+                    'user_id' => auth()->id()
+                ]);
+            }
+            $question->load('answers');
+            $html = view('exam.partials.question', compact('question'))->render();
+            return response()->json([
+                'success' => true, 
+                'html'    => $html
+            ]);
+        });
     }
-
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Question $question)
     {
-        //
+        $question->delete();
+        return response()->json(['success' => true]);
     }
 }

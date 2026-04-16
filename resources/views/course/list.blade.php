@@ -30,8 +30,11 @@
         @foreach($courses as $course)
         <tr>
             <td>{{ $course->id }}</td>
-            <td><img src="{{ asset('images/'.$course->image) }}" width="50"
-            height="50"></td>
+            <td><img src="{{ Storage::url( $path .'/'.$course->image) }}" width="50" height="50">
+        <img src="{{ asset('storage/'.$path . '/' . $course->image) }}" width="50" height="50">
+        
+        <img src="{{ Storage::disk('public')->url($path .'/'.$course->image) }}" width="50" height="50" alt="{{ $course->name }}"></td>
+
             <td>{{ $course->name }}</td>
             <td>{{ $course->price }}</td>
             <td>{{ $course->user->first_name }}</td>

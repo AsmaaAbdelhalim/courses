@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Answer;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Exceptions\FileUploadException;
 
 class QuestionService
 {
@@ -27,10 +28,42 @@ class QuestionService
     public function createQuestion(array $data, Request $request): Question
     {
         return DB::transaction(function () use ($data, $request) {
+            // Extract answers from data before creating question
+            $answers = $data['answers'] ?? [];
+            unset($data['answers']); // Remove answers from question data
+            
             $question = Question::create($data);
             $this->handleQuestionFiles($request, $question);
+            
+            // Create answers if provided
+            if (!empty($answers)) {
+                $this->createAnswers($question, $answers);
+            }
+            
             return $question;
         });
+    }
+
+    /**
+     * Create answers for a question
+     */
+    public function createAnswers(Question $question, array $answers): void
+    {
+        $answersData = [];
+        foreach ($answers as $answerData) {
+            $answersData[] = [
+                'question_id' => $question->id,
+                'answer' => $answerData['answer'],
+                'correct' => !empty($answerData['correct']) ? 1 : 0,
+                'user_id' => Auth::id(),
+                'exam_id' => $question->exam_id,
+                'course_id' => $question->course_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        
+        Answer::insert($answersData);
     }
 
     public function updateQuestion(Question $question, array $data, Request $request): Question
@@ -54,14 +87,17 @@ class QuestionService
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             
+            // Validate file before upload
             if (!$this->fileService->validateFile($file, self::ALLOWED_IMAGES, self::MAX_IMAGE_SIZE)) {
-                //throw new FileUploadException('Invalid image file');
+                throw new \RuntimeException('Invalid image file. Allowed types: ' . implode(', ', self::ALLOWED_IMAGES) . '. Max size: ' . (self::MAX_IMAGE_SIZE / 1024 / 1024) . 'MB');
             }
 
+            // Delete old image if exists
             if ($question->image) {
-                $this->fileService->deleteFile(self::IMAGE_PATH . '/' . $question->image);
+                $this->fileService->deleteFile($question->image, self::IMAGE_PATH);
             }
 
+            // Upload new image
             $question->image = $this->fileService->uploadFile($file, self::IMAGE_PATH);
             $question->save();
         }
@@ -72,14 +108,17 @@ class QuestionService
         if ($request->hasFile('video')) {
             $file = $request->file('video');
             
+            // Validate file before upload
             if (!$this->fileService->validateFile($file, self::ALLOWED_VIDEOS, self::MAX_VIDEO_SIZE)) {
-                //throw new FileUploadException('Invalid video file');
+                throw new \RuntimeException('Invalid video file. Allowed types: ' . implode(', ', self::ALLOWED_VIDEOS) . '. Max size: ' . (self::MAX_VIDEO_SIZE / 1024 / 1024) . 'MB');
             }
 
+            // Delete old video if exists
             if ($question->video) {
-                $this->fileService->deleteFile(self::VIDEO_PATH . '/' . $question->video);
+                $this->fileService->deleteFile($question->video, self::VIDEO_PATH);
             }
 
+            // Upload new video
             $question->video = $this->fileService->uploadFile($file, self::VIDEO_PATH);
             $question->save();
         }
@@ -90,57 +129,35 @@ class QuestionService
         if ($request->hasFile('files')) {
             $file = $request->file('files');
             
+            // Validate file before upload
             if (!$this->fileService->validateFile($file, self::ALLOWED_FILES, self::MAX_FILE_SIZE)) {
-                //throw new FileUploadException('Invalid files file');
+                throw new \RuntimeException('Invalid file. Allowed types: ' . implode(', ', self::ALLOWED_FILES) . '. Max size: ' . (self::MAX_FILE_SIZE / 1024 / 1024) . 'MB');
             }
 
+            // Delete old file if exists
             if ($question->files) {
-                $this->fileService->deleteFile(self::FILE_PATH . '/' . $question->files);
+                $this->fileService->deleteFile($question->files, self::FILE_PATH);
             }
 
+            // Upload new file
             $question->files = $this->fileService->uploadFile($file, self::FILE_PATH);
             $question->save();
         }
     }
-}
 
-public function __construct(
-    private readonly FileService $fileService
-) {}
-
-public function create(array $data, Request $request): Course
-{
-    $course = Course::create($data);
-    $this->handleMedia($request, $course);
-    return $course;
-}
-
-public function update(Course $course, array $data, Request $request): Course
-{
-    $course->update($data);
-    $this->handleMedia($request, $course);
-    return $course;
-}
-
-private function handleMedia(Request $request, Course $course): void
-{
-    foreach (self::MEDIA_CONFIG as $field => $config) {
-        if ($request->hasFile($field)) {
-            $this->processFile($request->file($field), $course, $field, $config);
-        }
-    }
-}
-
-private function processFile($file, Course $course, string $field, array $config): void
-{
-    if (!$this->fileService->validateFile($file, $config['types'], $config['max_size'])) {
-        return;
+    /**
+     * Get media URL for question image
+     */
+    public function getImageUrl(?string $fileName): ?string
+    {
+        return $this->fileService->getFileUrl($fileName, self::IMAGE_PATH);
     }
 
-    if ($course->{$field}) {
-        $this->fileService->deleteFile($config['path'] . '/' . $course->{$field});
+    /**
+     * Get media URL for question video
+     */
+    public function getVideoUrl(?string $fileName): ?string
+    {
+        return $this->fileService->getFileUrl($fileName, self::VIDEO_PATH);
     }
-
-    $course->{$field} = $this->fileService->uploadFile($file, $config['path']);
-    $course->save();
 }
